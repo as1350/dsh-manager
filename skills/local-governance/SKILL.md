@@ -31,15 +31,17 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 ### A. 新快照入库
 1. 构建（宿主 tsc + client tsdown，产物进 `lib/`）；
 2. `npm pack --pack-destination D:\Desktop\Dsh\本地项目\_snapshots\<包名>\`；
-3. MANIFEST.md：「归档版本」列追加新版本，「归档文件路径」更新；
-4. 若同时变更装配 → 走流程 B。
+3. **复制最新 tgz 到项目文件夹**（`D:\Desktop\Dsh\本地项目\<项目>\<包名>-<版本>.tgz`），随仓库提交——分发副本，他人可直接 `dsh add <tgz>`；
+4. MANIFEST.md：「归档版本」列追加新版本，「归档文件路径」更新；
+5. 若同时变更装配 → 走流程 B。
 
 ### B. 升级已装配包
 1. 改 `~/.dsh/profiles/web/package.json` 的 `file:` 路径指向新快照；
 2. profile 目录执行 `pnpm install`（注意：若 pnpm 复用旧 link 解析，需清除 `node_modules/.pnpm/lock.yaml` 与 `.package-map.json` 残留后重装）；
 3. 验证 `node_modules\<包>` 为实体目录、lockfile 记录 tarball integrity；
 4. MANIFEST.md：「装配方式/装配版本」更新；
-5. 提醒用户重启 DSH 并验证 `dev_plugin_status`。
+5. 同步项目文件夹内的最新 tgz（复制 + 提交，见流程 A 第 3 步）；
+6. 提醒用户重启 DSH 并验证 `dev_plugin_status`。
 
 ### C. 回滚
 1. `file:` 改回归档旧版本 tgz → `pnpm install` → 重启；
