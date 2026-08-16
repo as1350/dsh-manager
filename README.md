@@ -120,7 +120,7 @@ DSH Web 的管理面板合集（Skills 管理 + 部署补丁管理）——**静
 ## 目录结构（lib/ 即产物，无构建步骤）
 
 ```
-dsh-skill-manager-package/
+dsh-manager/
 ├── package.json      # dsh.bundle + dsh.client 双声明
 ├── cordis.patch.yml  # bundle 补丁层：向 profile 组合插入本包行
 ├── lib/
