@@ -1,0 +1,9 @@
+# dsh-manager bundle patch：把本包插入 profile 组合。
+# 这一行同时承载两端：
+#  - 宿主半边（lib/index.js）：注册 /api/dsh-manager HTTP 路由（技能管理 + 补丁管理）
+#  - 浏览器半边（lib/client.js）：client-modules 扫描到 dsh.client 声明后，
+#    把 exports["./client"] 作为 /plugins/<包名>/client.js 注入 window.__DSH_BOOT__
+
+- insert:
+    - id: dsh-manager
+      name: '@deepseek-ai/dsh-manager'

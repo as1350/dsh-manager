@@ -1,0 +1,20 @@
+{
+  "id": "dunhao-trigger",
+  "name": "顿号触发",
+  "description": "detectTrigger 中把 、（U+3001）归一化为 /：中文输入法下敲顿号也能打开 / 菜单，选中候选项后照常写入 /技能原名",
+  "apply": "refresh",
+  "files": [
+    {
+      "file": "node_modules/@deepseek-ai/dsh-client-ui-input-trigger/lib/client.js",
+      "kind": "replace",
+      "marker": "dunhao-trigger-patch",
+      "pairs": [
+        { "find": "if (ch !== \"/\" && ch !== \"@\") continue;", "replace": "if (trig !== \"/\" && trig !== \"@\") continue;", "count": 1 },
+        { "find": "if (guard.tier === \"claimed\" && ch === \"/\") continue;", "replace": "if (guard.tier === \"claimed\" && trig === \"/\") continue;", "count": 1 },
+        { "find": "if (!boundaryOk(draft, i, ch)) continue;", "replace": "if (!boundaryOk(draft, i, trig)) continue;", "count": 1 },
+        { "find": "trigger: ch,", "replace": "trigger: trig,", "count": 1 },
+        { "find": "const ch = draft.charAt(i);", "replace": "const ch = draft.charAt(i);\n\t\t\t\tconst trig = ch === \"\\u3001\" ? \"/\" : ch; // dunhao-trigger-patch: normalize U+3001 to slash", "count": 1 }
+      ]
+    }
+  ]
+}

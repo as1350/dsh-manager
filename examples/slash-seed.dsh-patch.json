@@ -1,0 +1,21 @@
+{
+  "id": "slash-seed",
+  "name": "斜杠播种",
+  "description": "空输入框默认存在 /（不敲触发字符直接打字即可识别技能与命令）；裸 / 视为空不发送、发送成功后重置回 /、未发送的草稿仍优先恢复、hero 输入框保持原样",
+  "apply": "refresh",
+  "files": [
+    {
+      "file": "node_modules/@deepseek-ai/dsh-client-ui-conversation/lib/client.js",
+      "kind": "replace",
+      "marker": "dsh-skill-manager-seed",
+      "pairs": [
+        { "find": "draft = \"\";", "replace": "draft = \"/\"; // dsh-skill-manager-seed: empty composer starts with a slash prefix", "count": 1 },
+        { "find": "this.adopt(\"\");", "replace": "this.adopt(\"/\");", "count": 3 },
+        { "find": "if (trimmed === \"\") return [];", "replace": "if (trimmed === \"\" || trimmed === \"/\") return [];", "count": 1 },
+        { "find": "const empty = draft.trim() === \"\" && attachments.length === 0;", "replace": "const empty = (draft.trim() === \"\" || draft.trim() === \"/\") && attachments.length === 0;", "count": 1 },
+        { "find": "if (this.snapshot.draft.trim() === \"\" && this.imageIds.length > 0) {", "replace": "if ((this.snapshot.draft.trim() === \"\" || this.snapshot.draft.trim() === \"/\") && this.imageIds.length > 0) {", "count": 1 },
+        { "find": "if (inputState.draft === \"\" && storedDraft !== \"\") inputActions.setDraft(storedDraft);", "replace": "if ((inputState.draft === \"\" || inputState.draft === \"/\") && storedDraft !== \"\") inputActions.setDraft(storedDraft);", "count": 1 }
+      ]
+    }
+  ]
+}

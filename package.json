@@ -1,0 +1,51 @@
+{
+  "name": "@deepseek-ai/dsh-manager",
+  "description": "DSH 管理面板（静态插件包）：Skills 管理（目录/开关/回收站/备注/别名/拼音/缓存）+ 目录驱动的部署补丁管理器（replace/script/override 三类补丁、多文件事务启用、官方快照+链重放状态模型、前置/互斥声明、类别分组、导入/拖放、恢复手册 RECOVERY.md、CLI 兜底）。",
+  "version": "0.7.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "examples/*.dsh-patch.json",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    }
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "plugin",
+    "skill",
+    "manager",
+    "web",
+    "ui"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "pinyin-pro": "^3.29.2"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "@deepseek-ai/cordis": "*",
+    "@deepseek-ai/dsh-client-ui-slots": "*",
+    "@deepseek-ai/dsh-client-locale": "*",
+    "@deepseek-ai/dsh-client-ui-workspace": "*"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  }
+}
