@@ -5,7 +5,8 @@ DSH Web 的管理面板合集（Skills 管理 + 部署补丁管理）——**静
 
 ## Skills 管理
 
-按 全局 / 项目 / 插件预设 / 系统内置 四组汇总当前技能目录，展示并**独立切换**每个技能的
+按 全局 / 项目 / 插件 / 预设 / 系统内置 五组汇总当前技能目录（0.8.5 起把「插件 / 预设」拆为两组：
+`custom` + 全局作用域 = 插件，`custom` + 预设作用域 = 预设），展示并**独立切换**每个技能的
 `Agent 可调用` 与 `用户可调用` 两个开关（直接改写技能文件的 frontmatter），支持：
 - 查看与编辑技能配置文件（可编辑来源可保存，只读来源只能外部打开）
 - **回收站**：卡片删除按钮（二次点击确认）把技能**移入回收站**；左侧导航「系统内置」下方新增
@@ -159,17 +160,25 @@ dsh-skill-manager-package/
 
 ## 安装（dsh plugin → pnpm 转发器）
 
+**仓库根目录携带当前最新版 tarball**（如 `deepseek-ai-dsh-manager-0.8.6.tgz`，随版本更新提交），
+克隆仓库即可直接安装，无需自行打包：
+
 ```powershell
-# 1) 在本目录打包出 tarball（等价：pnpm pack / npm pack）
-pnpm pack
+# 1) 克隆仓库（或直接从 GitHub 下载仓库内的 .tgz）
+git clone https://github.com/as1350/dsh-manager
+cd dsh-manager
 
 # 2) 装进 web profile（dsh plugin 会把参数原样转发给 profile 目录里的 pnpm，
 #    并在安装成功后自动把本包名追加进 dsh.profile.bundles）
-dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.7.0.tgz
+dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.8.6.tgz
 
 # 3) 重启 web（组合与 client-modules 扫描都发生在启动时）
 dsh web
 ```
+
+> 想从 GitHub 网页安装：打开仓库 → 点击 `deepseek-ai-dsh-manager-0.8.6.tgz` → Download →
+> 对下载文件执行 `dsh plugin --profile web add .\下载路径\deepseek-ai-dsh-manager-0.8.6.tgz`。
+> 包名/版本会随更新变化，以仓库内实际 tgz 文件名为准。
 
 安装后 profile 里会发生：
 
@@ -185,14 +194,15 @@ dsh-base + dsh-web-app bundle 提供；Node 侧模块解析走 `$DSH_HOME/profil
 回退符号链接场。运行时 npm 依赖仅 `pinyin-pro`（由 profile 的 pnpm 随安装解析）；
 peerDependencies 仅作文档，`autoInstallPeers: false` 下不会被安装。
 
-## 升级（0.7.0：直接加装，无需先删）
+## 升级（直接加装，无需先删）
 
 ```powershell
-# 0.6.0 起包名由 @deepseek-ai/dsh-skill-manager 更名为 @deepseek-ai/dsh-manager
-#（若仍装着 0.6.0 同名包，装上 0.7.0 同名 tgz 即覆盖升级；包名相同无需 remove）：
-dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.7.0.tgz
+# 包名相同，装上更高版本 tgz 即覆盖升级（无需 remove）：
+dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.8.6.tgz
 # 重启 dsh web 生效（备注/回收站/补丁状态都在 ~/.dsh，与包无关，零损失）
 ```
+
+> 仓库内 tgz 随版本更新；升级时以仓库根目录实际携带的最新 tgz 为准。
 
 ## 部署补丁（补丁面板为主通道，CLI 脚本为兜底）
 
@@ -267,7 +277,9 @@ dsh plugin --profile web remove @deepseek-ai/dsh-manager
 - `Agent 可调用` ← frontmatter `disable-model-invocation`（缺省=允许）
 - `用户可调用` ← frontmatter `user-invocable`（缺省=允许）
 - 二者独立。`user 开 + agent 关`：用户仍可 `/技能名` 强制调用（宿主注入正文），agent 不能自主调用。
-- 仅 `user-dsh / project-dsh / project-agents / user-agents` 可改权限/编辑/删除；`bundled / runtime / custom` 只读。
+- 仅 `user-dsh / project-dsh / project-agents / user-agents` 可编辑/删除；`bundled / runtime / custom`
+  内容只读，但 **0.8.6 起有配置文件路径的技能可在面板「解锁」后切换调用权限**（写回该技能文件，
+  重装包后还原）；跨预设作用域的技能一律仅查看。
 - 备注仅用户可见：存于 `~/.dsh/skills-notes.json`，模型只读 `SKILL.md`，永远不会看到备注。
 
 ## 开发备注
