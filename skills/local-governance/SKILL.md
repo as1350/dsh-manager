@@ -1,6 +1,6 @@
 ---
 name: local-governance
-description: 维护 DSH 本地治理体系——装配资产清单（_governance/MANIFEST.md）、仓库注册表（_governance/REPOS.md）、技能总账本（本地Skill仓库/SKILLS.md），以及本地包的归档/装配/升级/回滚流程。用户要求"更新清单/管理本地仓库/升级本地包/打快照"时调用。
+description: 维护 DSH 本地治理体系——装配资产清单（_governance/MANIFEST.md）、仓库注册表（_governance/REPOS.md）、技能总账本（skill仓库/SKILLS.md），以及本地包的归档/装配/升级/回滚流程。用户要求"更新清单/管理本地仓库/升级本地包/打快照"时调用。
 ---
 
 # local-governance — DSH 本地治理技能
@@ -13,7 +13,7 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 |---|---|---|
 | MANIFEST.md | `D:\Desktop\Dsh\本地项目\_governance\MANIFEST.md` | 装配资产（包/预设）：版本、快照、来源、维护状态 |
 | REPOS.md | `D:\Desktop\Dsh\本地项目\_governance\REPOS.md` | 仓库注册表：所有本地仓库的路径/用途/云端状态 |
-| SKILLS.md | `D:\Desktop\Dsh\本地项目\本地Skill仓库\SKILLS.md` | 技能总账本：技能名/源路径/来源 |
+| SKILLS.md | `D:\Desktop\Dsh\本地项目\skill仓库\SKILLS.md` | 技能总账本：技能名/源路径/来源 |
 
 归档快照：`D:\Desktop\Dsh\本地项目\_snapshots\<包名>\`（纯 tgz，无文档）。
 装配真相：`~/.dsh/profiles/web/package.json`（file: 指向归档）。
