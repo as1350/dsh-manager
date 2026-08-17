@@ -162,7 +162,7 @@ dsh-manager/
 
 ## 安装（dsh plugin → pnpm 转发器）
 
-**仓库根目录携带当前最新版 tarball**（如 `deepseek-ai-dsh-manager-0.10.0.tgz`，随版本更新提交），
+**仓库根目录携带当前最新版 tarball**（如 `deepseek-ai-dsh-manager-0.10.1.tgz`，随版本更新提交），
 克隆仓库即可直接安装，无需自行打包：
 
 ```powershell
@@ -172,14 +172,14 @@ cd dsh-manager
 
 # 2) 装进 web profile（dsh plugin 会把参数原样转发给 profile 目录里的 pnpm，
 #    并在安装成功后自动把本包名追加进 dsh.profile.bundles）
-dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.10.0.tgz
+dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.10.1.tgz
 
 # 3) 重启 web（组合与 client-modules 扫描都发生在启动时）
 dsh web
 ```
 
-> 想从 GitHub 网页安装：打开仓库 → 点击 `deepseek-ai-dsh-manager-0.10.0.tgz` → Download →
-> 对下载文件执行 `dsh plugin --profile web add .\下载路径\deepseek-ai-dsh-manager-0.10.0.tgz`。
+> 想从 GitHub 网页安装：打开仓库 → 点击 `deepseek-ai-dsh-manager-0.10.1.tgz` → Download →
+> 对下载文件执行 `dsh plugin --profile web add .\下载路径\deepseek-ai-dsh-manager-0.10.1.tgz`。
 > 包名/版本会随更新变化，以仓库内实际 tgz 文件名为准。
 
 安装后 profile 里会发生：
@@ -200,7 +200,7 @@ peerDependencies 仅作文档，`autoInstallPeers: false` 下不会被安装。
 
 ```powershell
 # 包名相同，装上更高版本 tgz 即覆盖升级（无需 remove）：
-dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.10.0.tgz
+dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.10.1.tgz
 # 重启 dsh web 生效（备注/回收站/补丁状态都在 ~/.dsh，与包无关，零损失）
 ```
 
