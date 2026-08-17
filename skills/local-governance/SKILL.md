@@ -1,6 +1,6 @@
 ---
 name: local-governance
-description: 维护 DSH 本地治理体系——装配资产清单（_governance/MANIFEST.md）、仓库注册表（_governance/REPOS.md）、技能总账本（skill仓库/SKILLS.md），以及本地包的归档/装配/升级/回滚流程。用户要求"更新清单/管理本地仓库/升级本地包/打快照"时调用。
+description: 维护 DSH 本地治理体系——装配资产清单（_governance/MANIFEST.md）、仓库注册表（_governance/REPOS.md）、机器账本（_governance/repos.json）、技能总账本（skill仓库/SKILLS.md），以及本地包的归档/装配/升级/回滚和本地仓库面板指令执行流程。用户要求"更新清单/管理本地仓库/升级本地包/打快照/本地仓库面板"时调用。
 ---
 
 # local-governance — DSH 本地治理技能
@@ -12,7 +12,8 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 | 账本 | 路径 | 管什么 |
 |---|---|---|
 | MANIFEST.md | `D:\Desktop\Dsh\本地项目\_governance\MANIFEST.md` | 装配资产（包/预设）：版本、快照、来源、维护状态 |
-| REPOS.md | `D:\Desktop\Dsh\本地项目\_governance\REPOS.md` | 仓库注册表：所有本地仓库的路径/用途/云端状态 |
+| REPOS.md | `D:\Desktop\Dsh\本地项目\_governance\REPOS.md` | 仓库注册表（人读）：所有本地仓库的路径/用途/云端状态 |
+| repos.json | `D:\Desktop\Dsh\本地项目\_governance\repos.json` | 仓库注册表（机器读）：多根目录 + 仓库字段真相 |
 | SKILLS.md | `D:\Desktop\Dsh\本地项目\skill仓库\SKILLS.md` | 技能总账本：技能名/源路径/来源 |
 
 归档快照：`D:\Desktop\Dsh\本地项目\_snapshots\<包名>\`（纯 tgz，无文档）。
@@ -60,6 +61,65 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 
 ### F. 技能登记
 - 新增/移动技能 → SKILLS.md 增删行（三列：技能名/源路径/来源）。
+
+### G. 本地仓库面板（repos.json / 多根目录）
+
+本地仓库面板负责**只读展示 + 生成指令**；以下写操作由 agent 执行，面板不直接改 repos.json/账本/git：
+
+| 操作 | 执行方 |
+|---|---|
+| 读写 `~/.dsh/dsh-manager/settings.json`（roots/governanceRoot） | 面板 |
+| 扫描目录、`git status`、`git fetch` | 面板（只读） |
+| 复制技能到 `~/.dsh/skills/<name>` 或 `<workspace>/.dsh/skills/<name>` | 面板（目标已存在则跳过） |
+| 删除 skill仓库 镜像技能目录 + 更新 SKILLS.md | 面板（二次确认后执行） |
+| 用户切换公开/私有时更新 repos.json 的 `private` 字段 | 面板（`gh repo edit` 成功后） |
+| 解析克隆地址、检测 git 代理、选择分类目录、生成克隆指令 | 面板 |
+| `git clone --recurse-submodules`、设置 git 代理、克隆后登记 repos.json/REPOS.md | agent |
+| 初始化/登记/修改 repos.json（除 private 即时字段）、REPOS.md、MANIFEST | agent |
+| git init/commit/push/pull/reset/submodule、`gh repo create`、skill仓库 的提交/推送 | agent |
+| 应用技能到插件包（复制+打包/提交/升版本/账本） | agent |
+
+**repos.json v2 schema**（机器真相；面板通常只读它，仅在用户切换公开/私有时直接更新 `private` 字段）：
+
+```json
+{
+  "version": 2,
+  "roots": ["D:/Desktop/Dsh/本地项目", "D:/Desktop/Dsh/插件集"],
+  "updatedAt": "ISO8601",
+  "repos": [
+    {
+      "id": "dsh-manager",
+      "path": "D:/Desktop/Dsh/本地项目/dsh-manager",
+      "type": "local",
+      "git": true,
+      "cloudRepo": "as1350/dsh-manager",
+      "upstream": "",
+      "private": false,
+      "lastChecked": "ISO8601",
+      "lastSync": "ISO8601",
+      "notes": ""
+    }
+  ]
+}
+```
+
+- `type`: `local`（自管项目，推自己 GitHub）或 `mirror`（上游镜像，严格等于上游）；
+- `path` 一律绝对路径；`git:false` 表示尚未初始化 Git；
+- `cloudRepo` 为空 = 未创建远端；`private:true` 时克隆命令锁定；
+- 所有 `repos` 条目合并归入中央 `_governance/repos.json`，不按根目录拆账。
+
+**常见 agent 指令模板**（面板写入输入框，agent 按此执行）：
+
+- **初始化/新增根目录**：扫描所有 roots 下一级目录，识别项目（含 `.git` 或 `package.json` 或 `.dsh`，排除 `_governance`/`_snapshots`/`skill仓库`）→ 创建/更新 repos.json + REPOS.md。
+- **初始化 Git 并登记**：`git init` + 初始提交 → repos.json `git=true` + REPOS.md。
+- **同步到 GitHub（已有远端）**：先提交未提交变更 → `git push origin <分支>` → 更新 `lastSync` + REPOS.md。
+- **创建仓库并推送**：`gh repo create <name> --source --push --public|--private` → 写 `cloudRepo` + REPOS.md。
+- **拉取更新（本地项目 behind）**：`git pull origin <分支>` → 冲突停下问用户 → 更新 `lastSync` + REPOS.md。
+- **更新镜像**：`git fetch upstream && git reset --hard upstream/<分支>` → submodule 更新 → 更新 `lastSync` + REPOS.md。镜像不允许保留本地改动；需要本地改动时先转为 `type:local` 另立项目维护。
+- **转为本地项目**：调整 remote → repos.json `type=local` + REPOS.md。
+- **应用到插件包**：复制技能目录到 `<项目>/<插件包>/skills/<技能名>/` → 按 dsh-plugin-lifecycle 打包/提交/升版本/更新 MANIFEST。
+
+**完成判据**：repos.json 与目录实况一致；每个仓库条目都有正确 `type/git/cloudRepo`；REPOS.md 跟 repos.json 同步更新；所有命令不推送未确认分支、不覆盖已有技能目录。
 
 ## 环境事实（勿重复探测）
 

@@ -148,10 +148,12 @@ dsh-manager/
   移入 = 内容完整备份后移除原文件（空目录一并清理）；还原 = 内容写回原路径（目标已存在则拒绝）；
   彻底删除 = 移除条目文件。条目 id 有白名单校验（防路径穿越）。
 - **浏览器半边**（`lib/client.js`）：`window.__ModuleLoader__.load({...})` 包装（与官方
-  `dsh.client` 包同款），React 取自平台模块表，用同源 `fetch` 调用宿主路由；UI 包含两个
-  侧边栏按钮与两个面板——「补丁」（Skills 上方，order -2）→ 补丁面板（类别分组/状态徽标/
-  启用/禁用/导入/删除/类别管理/提醒模式开关/可执行总闸/部署根展示），「Skills」（order -1）→
-  技能面板（四组导航、双半区大卡片、开关、删除、备注编辑、配置弹窗）。补丁面板开着时每 6 秒
+  `dsh.client` 包同款），React 取自平台模块表，用同源 `fetch` 调用宿主路由；UI 包含三个
+  侧边栏按钮与三个面板——「补丁」（order -2）→ 补丁面板（类别分组/状态徽标/启用/禁用/导入/
+  删除/类别管理/提醒模式开关/可执行总闸/部署根展示），「Skills」（order -1）→ 技能面板
+  （四组导航、双半区大卡片、开关、删除、备注编辑、配置弹窗），「本地仓库」（order 0）→
+  本地仓库面板（多根目录管理、本地项目状态/同步/克隆、GitHub 镜像自动检测/严格更新、
+  Skill 仓库分组与应用到全局/项目/插件，指令写入当前输入框）。补丁面板开着时每 6 秒
   现场轮询；提醒模式 B 下后台每 15 秒轮询并在按钮上显示丢失红点。
 - **通信面**：不走 Typert/Remote（那需要把描述符编译进部署的 `dsh-api-remotes`），
   而是与已内置的社区插件市场（dsh-webui-market-plugin）同款的自定义 webServer 路由。
@@ -160,7 +162,7 @@ dsh-manager/
 
 ## 安装（dsh plugin → pnpm 转发器）
 
-**仓库根目录携带当前最新版 tarball**（如 `deepseek-ai-dsh-manager-0.8.7.tgz`，随版本更新提交），
+**仓库根目录携带当前最新版 tarball**（如 `deepseek-ai-dsh-manager-0.9.0.tgz`，随版本更新提交），
 克隆仓库即可直接安装，无需自行打包：
 
 ```powershell
@@ -170,14 +172,14 @@ cd dsh-manager
 
 # 2) 装进 web profile（dsh plugin 会把参数原样转发给 profile 目录里的 pnpm，
 #    并在安装成功后自动把本包名追加进 dsh.profile.bundles）
-dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.8.7.tgz
+dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.9.0.tgz
 
 # 3) 重启 web（组合与 client-modules 扫描都发生在启动时）
 dsh web
 ```
 
-> 想从 GitHub 网页安装：打开仓库 → 点击 `deepseek-ai-dsh-manager-0.8.7.tgz` → Download →
-> 对下载文件执行 `dsh plugin --profile web add .\下载路径\deepseek-ai-dsh-manager-0.8.7.tgz`。
+> 想从 GitHub 网页安装：打开仓库 → 点击 `deepseek-ai-dsh-manager-0.9.0.tgz` → Download →
+> 对下载文件执行 `dsh plugin --profile web add .\下载路径\deepseek-ai-dsh-manager-0.9.0.tgz`。
 > 包名/版本会随更新变化，以仓库内实际 tgz 文件名为准。
 
 安装后 profile 里会发生：
@@ -198,7 +200,7 @@ peerDependencies 仅作文档，`autoInstallPeers: false` 下不会被安装。
 
 ```powershell
 # 包名相同，装上更高版本 tgz 即覆盖升级（无需 remove）：
-dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.8.7.tgz
+dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.9.0.tgz
 # 重启 dsh web 生效（备注/回收站/补丁状态都在 ~/.dsh，与包无关，零损失）
 ```
 
