@@ -15,6 +15,7 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 | REPOS.md | `D:\Desktop\Dsh\本地项目\_governance\REPOS.md` | 仓库注册表（人读）：所有本地仓库的路径/用途/云端状态 |
 | repos.json | `D:\Desktop\Dsh\本地项目\_governance\repos.json` | 仓库注册表（机器读）：多根目录 + 仓库字段真相 |
 | SKILLS.md | `D:\Desktop\Dsh\本地项目\skill仓库\SKILLS.md` | 技能总账本：技能名/源路径/来源 |
+| CHANGELOG.md | `D:\Desktop\Dsh\本地项目\dsh-manager\CHANGELOG.md` | 项目更新日志：版本/日期/类型/说明 |
 
 归档快照：`D:\Desktop\Dsh\本地项目\_snapshots\<包名>\`（纯 tgz，无文档）。
 装配真相：`~/.dsh/profiles/web/package.json`（file: 指向归档）。
@@ -35,15 +36,17 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 2. `npm pack --pack-destination D:\Desktop\Dsh\本地项目\_snapshots\<包名>\`；
 3. **复制最新 tgz 到项目文件夹**（`D:\Desktop\Dsh\本地项目\<项目>\<包名>-<版本>.tgz`），随仓库提交——分发副本，他人可直接 `dsh add <tgz>`；
 4. MANIFEST.md：「归档版本」列追加新版本，「归档文件路径」更新；
-5. 若同时变更装配 → 走流程 B。
+5. 更新 `CHANGELOG.md`（追加条目：版本/日期/类型/说明）；
+6. 若同时变更装配 → 走流程 B。
 
 ### B. 升级已装配包
 1. 改 `~/.dsh/profiles/web/package.json` 的 `file:` 路径指向新快照；
 2. profile 目录执行 `pnpm install`（注意：若 pnpm 复用旧 link 解析，需清除 `node_modules/.pnpm/lock.yaml` 与 `.package-map.json` 残留后重装）；
 3. 验证 `node_modules\<包>` 为实体目录、lockfile 记录 tarball integrity；
 4. MANIFEST.md：「装配方式/装配版本」更新；
-5. 同步项目文件夹内的最新 tgz（复制 + 提交，见流程 A 第 3 步）；
-6. 提醒用户重启 DSH 并验证 `dev_plugin_status`。
+5. 更新 `CHANGELOG.md`（追加条目：版本/日期/类型/说明）；
+6. 同步项目文件夹内的最新 tgz（复制 + 提交，见流程 A 第 3 步）；
+7. 提醒用户重启 DSH 并验证 `dev_plugin_status`。
 
 ### C. 回滚
 1. `file:` 改回归档旧版本 tgz → `pnpm install` → 重启；
