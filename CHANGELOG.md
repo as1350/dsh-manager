@@ -3,6 +3,9 @@
 格式：`版本 - 日期 - 类型`，类型 ∈ {feat, fix, chore, docs}。
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
+
+## 0.10.3 - 2026-08-19 - fix
+- 本地仓库面板「GitHub项目」tab 卡片网格缺纵向滚动：镜像根在列表末尾的项目被视口裁掉、无法下滑（如 `反代项目` 下 ds-freebuff2api/sub2api 仅存数据、面板不可见）。为 `.skm-repo-grid` 补 `overflow-y:auto; min-height:0`，与「本地项目/Skill仓库」tab 滚动行为一致。
 ## 0.10.2 - 2026-08-17 - chore/docs
 - 更新流程新增 `CHANGELOG.md`：每次 bump 必须追加条目。
 - `package.json` `files` 纳入 `CHANGELOG.md`，随包分发。
