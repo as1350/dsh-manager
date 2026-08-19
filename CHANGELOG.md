@@ -4,6 +4,9 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.11.0 - 2026-08-19 - feat
+- 本地仓库面板：切换公开/私有后自动同步人读账本 REPOS.md 对应行的「云端状态」，不再生成「请同步 REPOS.md」的 agent 指令草稿（`repoSetVisibility` 内新增 `updateReposMdVisibility`，客户端 `setVisibility` 移除 `draft`）。
+
 ## 0.10.3 - 2026-08-19 - fix
 - 本地仓库面板「GitHub项目」tab 卡片网格缺纵向滚动：镜像根在列表末尾的项目被视口裁掉、无法下滑（如 `反代项目` 下 ds-freebuff2api/sub2api 仅存数据、面板不可见）。为 `.skm-repo-grid` 补 `overflow-y:auto; min-height:0`，与「本地项目/Skill仓库」tab 滚动行为一致。
 ## 0.10.2 - 2026-08-17 - chore/docs
