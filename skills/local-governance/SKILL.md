@@ -1,6 +1,6 @@
 ---
 name: local-governance
-description: 维护 DSH 本地治理体系——装配资产清单（_governance/MANIFEST.md）、仓库注册表（_governance/REPOS.md）、机器账本（_governance/repos.json）、技能总账本（skill仓库/SKILLS.md），以及本地包的归档/装配/升级/回滚和本地仓库面板指令执行流程。用户要求"更新清单/管理本地仓库/升级本地包/打快照/本地仓库面板"时调用。
+description: 维护 DSH 本地治理体系——装配资产清单（_governance/MANIFEST.md）、仓库注册表（_governance/REPOS.md）、机器账本（_governance/repos.json）、技能总账本（skill仓库/SKILLS.md），以及本地包的归档/装配/升级/回滚、本地修改登记（CHANGELOG-local.md）和本地仓库面板指令执行流程。用户要求"更新清单/管理本地仓库/升级本地包/打快照/本地仓库面板/登记本地修改"时调用。
 ---
 
 # local-governance — DSH 本地治理技能
@@ -16,6 +16,7 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 | repos.json | `D:\Desktop\Dsh\本地项目\_governance\repos.json` | 仓库注册表（机器读）：多根目录 + 仓库字段真相 |
 | SKILLS.md | `D:\Desktop\Dsh\本地项目\skill仓库\SKILLS.md` | 技能总账本：技能名/源路径/来源 |
 | CHANGELOG.md | `D:\Desktop\Dsh\本地项目\dsh-manager\CHANGELOG.md` | 项目更新日志：版本/日期/类型/说明 |
+| 本地维护日志 | 各受管仓库根目录 `CHANGELOG-local.md` | 本地改动登记：`### [commit <hash>] <标题>` 条目 + 笔记段落 |
 
 归档快照：`D:\Desktop\Dsh\本地项目\_snapshots\<包名>\`（纯 tgz，无文档）。
 装配真相：`~/.dsh/profiles/web/package.json`（file: 指向归档）。
@@ -28,6 +29,8 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 4. **值域严格**：MANIFEST「装配方式」∈ {file: tgz, link:, 目录复制, 未装配}；SKILLS.md「来源」∈ {上游路径, 自建}；
 5. **自检**：更新账本后检查列数一致、版本号格式 `^\d+\.\d+\.\d+$`、归档路径存在。
 6. **版本只增不覆盖**：任何已打包/已装配的包发生代码或功能变更（含修复、文案、UI 调整）后，必须递增版本号——新增功能/接口/面板 → 次版本；缺陷修复/文案/小调整 → 修订版本。**禁止原地覆盖同名 tgz**；每次 bump 后重新走 A/B 流程并同步 MANIFEST/README/profile。
+7. **本地改动必登记**：任何受管仓库发生本地改动（代码/UI/配置/文档）后，必须在该仓库根目录 `CHANGELOG-local.md` 登记对应 commit（`### [commit <hash>] <标题>`），否则视为未完成；
+8. **分支与同步纪律**：本地改动提交到本地维护分支（如 `local-custom`），不直接改 `main/master`；拉取上游用 `git pull --rebase <远端> <上游分支>`（本项目惯例 `git pull --rebase origin main`），冲突停下问用户并在文档笔记段记录。
 
 ## 标准流程
 
@@ -121,9 +124,25 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 - **拉取更新（本地项目 behind）**：`git pull origin <分支>` → 冲突停下问用户 → 更新 `lastSync` + REPOS.md。
 - **更新镜像**：`git fetch upstream && git reset --hard upstream/<分支>` → submodule 更新 → 更新 `lastSync` + REPOS.md。镜像不允许保留本地改动；需要本地改动时先转为 `type:local` 另立项目维护。
 - **转为本地项目**：调整 remote → repos.json `type=local` + REPOS.md。
+- **登记本地修改**：检测 outgoing 中未被 `CHANGELOG-local.md` 覆盖的 commit → 生成指令要求 agent 补登 `### [commit <hash>] <标题>` 并提交文档。
 - **应用到插件包**：复制技能目录到 `<项目>/<插件包>/skills/<技能名>/` → 按 dsh-plugin-lifecycle 打包/提交/升版本/更新 MANIFEST。
 
 **完成判据**：repos.json 与目录实况一致；每个仓库条目都有正确 `type/git/cloudRepo`；REPOS.md 跟 repos.json 同步更新；所有命令不推送未确认分支、不覆盖已有技能目录。
+
+### H. 本地修改登记
+
+适用于所有 `type: local` 的受管仓库（含 upstream 上游的本地维护项目）。
+
+1. `cd <项目>`，确认当前在本地维护分支（如 `local-custom`；不存在则基于 main 创建并记录分叉点）；
+2. 完成本地改动（代码/UI/配置/文档）；
+3. 提交业务改动，`git rev-parse --short HEAD` 取 hash；
+4. 在项目根 `CHANGELOG-local.md` 追加 `### [commit <hash>] <标题>` 条目，附 1–3 条改动摘要；
+5. 提交 `CHANGELOG-local.md`；
+6. 推送自己的远端分支（如 `git push origin local-custom`），不直接推上游 main/master；
+7. 同步上游：`git pull --rebase origin main`，冲突停下问用户，并在文档笔记段记录 rebase 与冲突处理；
+8. 按仓库面板要求更新 `lastSync` / `REPOS.md`（如适用）。
+
+**完成判据**：每一个本地业务 commit 都能在 `CHANGELOG-local.md` 找到对应登记；本地维护分支已推送；上游同步完成后无未解决冲突。
 
 ## 环境事实（勿重复探测）
 
