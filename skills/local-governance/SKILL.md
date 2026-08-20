@@ -37,7 +37,7 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 ### A. 新快照入库
 1. 构建（宿主 tsc + client tsdown，产物进 `lib/`）；
 2. `npm pack --pack-destination D:\Desktop\Dsh\本地项目\_snapshots\<包名>\`；
-3. **复制最新 tgz 到项目文件夹**（`D:\Desktop\Dsh\本地项目\<项目>\<包名>-<版本>.tgz`），随仓库提交——分发副本，他人可直接 `dsh add <tgz>`；
+3. **复制最新 tgz 到项目文件夹**（`D:\Desktop\Dsh\本地项目\<项目>\<包名>-<版本>.tgz`），随仓库提交——分发副本，他人可直接 `dsh add <tgz>`。**同一时间项目文件夹只保留最新一个 tgz**：复制前先删除目录内所有旧版本 `<包名>-*.tgz`（已被 git 跟踪的用 `git rm`），避免堆积；
 4. MANIFEST.md：「归档版本」列追加新版本，「归档文件路径」更新；
 5. 更新 `CHANGELOG.md`（追加条目：版本/日期/类型/说明）；
 6. 若同时变更装配 → 走流程 B。
