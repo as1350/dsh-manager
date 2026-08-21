@@ -4,6 +4,15 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.34.2 - 2026-08-22 - fix
+- 代码审查 75 项发现的落地修复（审查文档：`D:\Desktop\Dsh\总结文档\dsh-manager-代码审查总结.md` / `dsh-manager-修复报告.md`）：
+  - S1×6 全部修复：F1-1 COMPANION_RE 收紧（禁 `.` / `..` 路径穿越）、F1-2 移除快照共享破坏的无条件 deleteSnapshot、F2-1 日志流 error 监听、F2-2 外部进程匹配收紧（cwd>3 + 词边界 + name≥5）、F3-1 safeSkillName 校验、F3-2 只读 .env.example。
+  - S2×26 全部修复：readBody 10MB 上限 / readNotesStore 静默降级 / doDisable 事务回滚 / patchScan 串行化 / vm codeGeneration 两处收紧（runScriptTransform + resolveCustomSkillDir）/ 服务操作 serializedSvc 串行化 / PID 复用核验 / 端口复检 / healthUrl port 守卫 / port 校验 / 行缓冲 1MB 上限 / AI 命令脱敏 / externalKill 核验 / AI 预热 catch / AI 代次计数 / repoScan 并发 5 / repoDetail 缓存淘汰 / repoDeleteSkill 解析 / rpc 120s / AI 轮询清理 / 'none' 终态 / 面板按需加载 / 镜像轮询并发 3 / i18n card.saveFailed。
+  - S3×2：F3-12 setInvocation 复用 writableDefinition 等；遗留 41 项 S3 延后（详见修复报告）。
+  - F1-8 二审补全：resolveCustomSkillDir 的 runInNewContext 补 `codeGeneration: { strings: false, wasm: false }`（与 runScriptTransform 对称）。
+- client.js VERSION 0.34.1 → 0.34.2 对齐（随升版修正 F4-1 类漂移）。
+- 装配方式：目录复制 → file: tgz 快照装配（`deepseek-ai-dsh-manager-0.34.2.tgz`）。
+
 ## 0.34.1 - 2026-08-21 - docs
 - local-governance 流程 A 第 3 步固化「项目文件夹同一时间只保留最新一个 tgz」：复制新版本前先删除目录内所有旧版本 `<包名>-*.tgz`（已跟踪的用 `git rm`）。
 - 清理：dsh-manager 项目目录移除 26 个旧版本 tgz（0.10.2–0.27.0），只保留 0.34.0 分发副本；旧版本仍在 `_snapshots` 归档（回滚载体不受影响）。
