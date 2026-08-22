@@ -1,7 +1,31 @@
 # @deepseek-ai/dsh-manager
 
-DSH Web 的管理面板合集（Skills 管理 + 部署补丁管理）——**静态插件包**（0.6.0 起由
-`@deepseek-ai/dsh-skill-manager` 更名合并而来）。
+DSH Web 的管理面板合集（**静态插件包**，0.6.0 起由 `@deepseek-ai/dsh-skill-manager` 更名合并而来）。
+
+一个包覆盖五大模块：
+
+| 模块 | 说明 |
+|---|---|
+| **Skills 管理** | 技能目录汇总、Agent/用户调用开关、回收站、备注/别名、拼音匹配、配置编辑、**观察与自优化开关** |
+| **部署补丁管理** | 目录驱动的 replace/script/override 三类补丁引擎（快照 + 链重放 + 事务 + RECOVERY.md + CLI 兜底） |
+| **本地仓库面板** | 多根目录扫描、GitHub 克隆/镜像、git 状态与 fetch、仓库详情、Skill 仓库同步、AI 讲解 |
+| **服务面板** | 本地服务识别、静默启动配置（venv launcher）、进程/端口/健康阶梯测试、日志、AI 诊断 |
+| **随包治理技能集** | 6 个随包分发的技能：local-governance / dsh-repo-clone / dsh-review / service-config / skill-optimize / dsh-plugin-lifecycle |
+
+## 随包技能集（治理与工作流）
+
+`skills/` 目录随包自动扫描注册（0.34.5 起目录即真相，新增技能只需建目录放 SKILL.md），构成一套完整的本地治理工作流：
+
+| 技能 | 职责 |
+|---|---|
+| `local-governance` | 本地治理体系总纲：装配清单（MANIFEST.md）、仓库注册表（REPOS.md）、机器账本（repos.json）、归档/装配/升级/回滚、更新后审核钩子与待办提醒 |
+| `dsh-repo-clone` | 克隆远端仓库到本地 DSH 目录树 + 登记治理账本（代理检查、schannel 应急、克隆后快速分析与 DSH 插件装配询问） |
+| `dsh-review` | 审核/复核项目更新：读待审核队列 → 定位 diff → 一审 7 维 → 二审源码证伪 → 修复前评估 → 修复验证并写回 |
+| `service-config` | 给本地项目配置服务面板的服务：识别类型 → 生成静默启动配置 → 写入 services.json → 阶梯测试 |
+| `skill-optimize` | 处理技能观察记录并落地技能优化（去噪评估 → 最小方案 → 用户确认 → 落地 → 写回），判据为 writing-for-agents |
+| `dsh-plugin-lifecycle` | DSH 插件全生命周期：从零到发布/退役（仅模型自动调用） |
+
+配套机制：**更新后主动询问审核**（代码/配置变更发版后询问立即/推迟，登记/克隆静默入队 `_governance/pending-reviews.json`）；**技能观察与自优化**（面板卡片「启动优化检测」开关，任务结束统一复盘一次，收尾只记录、修改永远过用户确认，状态存 `_governance/skill-observations.json`）。
 
 ## Skills 管理
 
@@ -15,20 +39,23 @@ DSH Web 的管理面板合集（Skills 管理 + 部署补丁管理）——**静
 - **备注名即 `/` 菜单别名**：面板里给技能写的备注名会注册为 `/` 触发菜单的「技能别名」源——
   模糊匹配（同命令源算法）、仅"用户可调用"开启的技能参与、原名已命中时不重复出现；
   选中别名行后输入框写入 `/技能原名 `；面板内搜索框同样支持按备注名过滤
-- **拼音 / 首字母匹配（0.5.0）**：备注名与中文技能原名在 `/` 菜单里支持拼音全拼前缀、
-  拼音有序子序列模糊、音节首字母前缀（如 `kaoda`、`kaod`、`kd`、`kdw` 均可命中"拷打我"）；
-  面板搜索同样支持拼音/首字母**子串**过滤。拼音由宿主端 `pinyin-pro` 一次性转换并随
-  `notesGet`/`catalog` 下发为普通字符串字段，客户端零新增依赖、零 bundler、bundle 体积不变。
-  匹配层级：原文前缀 > 原文模糊 > 全拼前缀 > 首字母前缀 > 全拼模糊；无别名但原名含中文、
-  被拼音命中的技能在菜单里显示为裸原名
-- **击键零 RPC 缓存（0.5.1）**：`/` 菜单源改为按会话客户端缓存（catalog+notesGet 并行拉取、
-  6 秒 TTL、过期后台刷新 stale-while-revalidate），命中时候选同步返回，把"空结果自动关闭"
-  前的等待压到一帧内
+- **拼音 / 首字母匹配**：备注名与中文技能原名在 `/` 菜单里支持拼音全拼前缀、拼音有序子序列模糊、
+  音节首字母前缀（如 `kaoda`、`kaod`、`kd`、`kdw` 均可命中"拷打我"）；面板搜索同样支持
+  拼音/首字母**子串**过滤。拼音由宿主端 `pinyin-pro` 一次性转换并随 `notesGet`/`catalog`
+  下发为普通字符串字段，客户端零新增依赖。匹配层级：原文前缀 > 原文模糊 > 全拼前缀 >
+  首字母前缀 > 全拼模糊；无别名但原名含中文、被拼音命中的技能在菜单里显示为裸原名
+- **击键零 RPC 缓存**：`/` 菜单源按会话客户端缓存（catalog+notesGet 并行拉取、6 秒 TTL、
+  过期后台刷新 stale-while-revalidate），命中时候选同步返回
+- **观察开关（0.35.2）**：每个技能卡片「启动优化检测」开关（默认全关）——插件技能运行时注入
+  观察约定块（不污染包内文件）、全局/项目技能直改 SKILL.md 文件；任务结束统一复盘一次并追加
+  记录到 `_governance/skill-observations.json`；优化建议累积后由 `skill-optimize` 处理
+- **面板秒显缓存（0.35.4/0.35.5）**：catalog 快照按 (sessionId, cwd) 缓存并持久化到
+  sessionStorage——面板重开先秒显旧数据再后台刷新，页面刷新后仍秒显
 
 ## 部署补丁管理（0.7.0：目录驱动）
 
 侧边栏 **Skills 上方**新增「补丁」按钮（同款样式）→ 目录驱动的补丁面板。补丁是一个**声明文件 +
- 可选配套文件**的集合，放在补丁目录里即被识别：
+可选配套文件**的集合，放在补丁目录里即被识别：
 
 ```
 ~/.dsh/dsh-manager/patches/
@@ -89,6 +116,46 @@ DSH Web 的管理面板合集（Skills 管理 + 部署补丁管理）——**静
 - `script`：`script` 指向同目录的 `*.dsh-patch.js`（`module.exports = { apply(text) }`）
 - `override`：`override` 指向同目录 `<name>.override/`，其内单个文件名为 `file`
 
+## 本地仓库面板（0.9.0：多根目录）
+
+侧边栏第三个按钮 → 本地仓库面板。把本地仓库纳入治理视图：
+
+- **多根目录**：`settings.json` 配置 `roots[]`，扫描时跳过 `node_modules/.git/_governance/_snapshots`；
+  未登记的仓库自动探测 git 远端与 GitHub 元数据（`git remote get-url` + `gh repo view`）
+- **GitHub 镜像**：登记为 mirror 的仓库可一键 `git fetch` / 严格更新；支持仓库可见性切换、删除、目录管理
+- **克隆新项目**：面板生成含仓库信息的指令填入输入框 → 发给 agent 执行（配套 `dsh-repo-clone` 技能
+  标准化克隆 + 治理登记 + 克隆后快速分析与 DSH 插件装配询问）
+- **Skill 仓库分组**：扫描 `_governance/skill仓库/` 下 本地/插件/项目 三组技能，可复制到全局或项目
+- **仓库详情**：三层缓存（内存 SWR → 磁盘指纹 → 全量），展示 git 状态、提交历史、README、AI 讲解
+- **AI 讲解**：`aiExplainWarmup/Request/Status` 系列——选中仓库后流式生成讲解（需配置 AI provider）
+- **性能（0.35.0/0.35.1/0.35.3）**：repoScan host 侧 SWR 缓存（15s TTL + force 强制重扫）+
+  启动后台预热——冷启动首次打开从 7-8s 变秒开，刷新按钮与服务面板注册变更即时生效
+
+## 服务面板（service-config）
+
+侧边栏第四个按钮 → 服务面板。为本地项目配置**静默启动**的本地服务：
+
+- **识别**：按项目特征识别服务类型（Node / Python venv / 前后端一体 / 多服务）
+- **配置生成**：生成静默启动配置（venv launcher 弹窗 → base python + PYTHONPATH），写入 `services.json`
+- **阶梯测试**：启动后按 进程 → 端口 → healthUrl 三级验证，失败接 AI 诊断
+- **运行管理**：启动/停止/重启/全部启停、日志查看与轮转、崩溃自动重启退避、detached 进程懒归档
+- **配套技能**：`service-config` 技能把「配置服务 / 让服务静默启动」这类需求标准化
+
+## 治理体系（local-governance）
+
+本包携带完整的本地治理工作流（`local-governance` 技能为总纲），账本集中在 `_governance/` 目录：
+
+| 文件 | 用途 |
+|---|---|
+| `MANIFEST.md` | 装配资产清单：包名/装配方式/装配版本/归档版本/路径/上游/备注 |
+| `REPOS.md` | 仓库注册表：所有本地仓库的状态总账（人工可读） |
+| `repos.json` | 机器账本：面板读取的仓库真相（v2 schema，type ∈ {local, mirror}） |
+| `pending-reviews.json` | 待审核队列：更新后按流程入队，`dsh-review` 审核写回 done |
+| `skill-observations.json` | 技能观察记录：观察开关状态 + 优化建议，`skill-optimize` 消费 |
+
+核心纪律：**版本只增不覆盖**、**账实一致**（目录实况 = repos.json = REPOS.md 三者一致）、
+**更新后主动询问审核**（代码/配置变更类询问立即/推迟；登记/克隆静默入队不打扰）。
+
 ## 定位定义（在 harness 架构中的归类）
 
 **一句话**：dsh-manager 是一个**安装树外（out-of-tree）的双面（dual-face）web profile bundle 插件**——
@@ -121,48 +188,62 @@ DSH Web 的管理面板合集（Skills 管理 + 部署补丁管理）——**静
 
 ```
 dsh-manager/
-├── package.json      # dsh.bundle + dsh.client 双声明
+├── package.json      # dsh.bundle + dsh.client 双声明（files 白名单见下）
 ├── cordis.patch.yml  # bundle 补丁层：向 profile 组合插入本包行
 ├── lib/
-│   ├── index.js      # 宿主半边：/api/dsh-manager 路由（webServer），技能管理 + 补丁引擎
-│   └── client.js     # 浏览器半边：__ModuleLoader__ 入口，补丁/Skills 双按钮 + 双面板
+│   ├── index.js      # 宿主半边：/api/dsh-manager 路由（webServer），全部 rpc 实现
+│   ├── client.js     # 浏览器半边：__ModuleLoader__ 入口，4 按钮 + 4 面板 + CSS
+│   ├── service-core.js  # 服务面板引擎（识别/配置/启停/日志/诊断）
+│   ├── repo-core.js     # 本地仓库引擎（扫描/检测/详情/git 状态）
+│   └── ai-core.js       # AI 讲解引擎（provider/流式/缓存）
+├── skills/           # 随包技能（6 个，自动扫描注册：目录即真相）
+│   ├── local-governance/  dsh-repo-clone/  dsh-review/
+│   ├── service-config/    skill-optimize/  dsh-plugin-lifecycle/
+├── examples/         # 示例补丁（*.dsh-patch.json，随 tarball 分发但不自动安装）
+├── scripts/          # CLI 兜底与验证脚本（不打包进 tarball）
 └── README.md
 ```
 
 - **宿主半边**（`lib/index.js`）：普通 Cordis 插件，`inject: ['webServer']`，注册
-  `POST /api/dsh-manager`（`{ method, args }` → JSON），实现
-  `catalog` / `config` / `save` / `setInvocation` / `trash` / `trashList` / `trashRestore` /
-  `trashDelete` / `notesGet` / `notesSave` 十个技能管理方法，以及目录驱动的补丁引擎方法：
-  `patchScan` / `patchEnable` / `patchDisable` / `patchImport` / `patchCategoryAdd` /
-  `patchCategoryRename` / `patchCategoryDelete` / `patchDelete` / `patchSettingsGet` /
-  `patchSettingsSet`（目录扫描 + 现场读盘状态判定 + 多文件事务 + 快照/链重放 + 前置互斥 +
-  原子写 + 部署根自动定位 + RECOVERY.md 自动重写）。
-  `catalog` 对中文技能原名、`notesGet`/`notesSave` 对备注名附带 `pinyin`/`initials`
-  字段（`pinyin-pro` 转换，按输入串缓存，保存备注时整表失效；纯英文无字段，转换失败静默降级）。
-  **写入路径（重要）**：这里的写操作都是“用户点击 UI 按钮”发起的用户动作，不是模型动作，
-  因此不走模型面的沙箱 `ctx.fs`（它按部署默认模式拒绝工作区外写入），而是与内置
-  `dsh-settings-file` 一致，作为受信任宿主行直接用 `node:fs` 写入；边界由两道闸门收紧——
-  写入路径只来自 skills 注册表（不接受前端路径）、仅 `user-dsh/project-dsh/project-agents/user-agents`
-  可写可移入回收站。写文件用临时文件 + rename 原子替换；备注是单文件读改写，用模块级队列串行化。
+  `POST /api/dsh-manager`（`{ method, args }` → JSON），实现约 60 个方法：
+  - 技能管理：`catalog` / `config` / `save` / `setInvocation` / `trash` / `trashList` /
+    `trashRestore` / `trashDelete` / `notesGet` / `notesSave` / `skillDetail` /
+    `skillObserveGet` / `skillObserveSet` / `skillObserveList`
+  - 补丁引擎：`patchScan` / `patchEnable` / `patchDisable` / `patchImport` /
+    `patchCategoryAdd` / `patchCategoryRename` / `patchCategoryDelete` / `patchDelete` /
+    `patchSettingsGet` / `patchSettingsSet`
+  - 本地仓库：`repoSettingsGet` / `repoSettingsSet` / `repoScan` / `repoGitStates` /
+    `repoFetch` / `repoDetail` / `repoSetVisibility` / `repoDeleteSkill` /
+    `repoListDirs` / `repoCreateDir` / `repoGetProxy` / `repoScanPluginPackages` /
+    `repoCopySkillToGlobal` / `repoCopySkillToProject`
+  - 服务：`serviceSettingsGet` / `serviceSettingsSet` / `serviceScan` / `serviceRegister` /
+    `serviceConfigSet` / `serviceUnregister` / `serviceStart` / `serviceStop` /
+    `serviceExternalKill` / `serviceRestart` / `serviceStartAll` / `serviceStopAll` /
+    `serviceLogGet` / `serviceLogClear` / `serviceAiDiagnose` / `serviceLogAi` / `serviceAiDraft`
+  - AI 讲解：`aiExplainWarmup` / `aiExplainRequest` / `aiExplainDebug` /
+    `aiExplainClearCache` / `aiProvidersList` / `aiExplainStatus`
+  - `catalog` 对中文技能原名、`notesGet`/`notesSave` 对备注名附带 `pinyin`/`initials`
+    字段（`pinyin-pro` 转换，按输入串缓存，保存备注时整表失效；纯英文无字段，转换失败静默降级）
+  - **写入路径（重要）**：写操作都是“用户点击 UI 按钮”发起的用户动作，不是模型动作，
+    因此不走模型面的沙箱 `ctx.fs`（它按部署默认模式拒绝工作区外写入），而是与内置
+    `dsh-settings-file` 一致，作为受信任宿主行直接用 `node:fs` 写入；边界由两道闸门收紧——
+    写入路径只来自 skills 注册表（不接受前端路径）、仅 `user-dsh/project-dsh/project-agents/user-agents`
+    可写可移入回收站。写文件用临时文件 + rename 原子替换；备注是单文件读改写，用模块级队列串行化
 - **回收站**：`~/.dsh/skills-trash/<id>.json`，每条含 name/source/path/content/deletedAt。
   移入 = 内容完整备份后移除原文件（空目录一并清理）；还原 = 内容写回原路径（目标已存在则拒绝）；
-  彻底删除 = 移除条目文件。条目 id 有白名单校验（防路径穿越）。
+  彻底删除 = 移除条目文件。条目 id 有白名单校验（防路径穿越）
 - **浏览器半边**（`lib/client.js`）：`window.__ModuleLoader__.load({...})` 包装（与官方
-  `dsh.client` 包同款），React 取自平台模块表，用同源 `fetch` 调用宿主路由；UI 包含三个
-  侧边栏按钮与三个面板——「补丁」（order -2）→ 补丁面板（类别分组/状态徽标/启用/禁用/导入/
-  删除/类别管理/提醒模式开关/可执行总闸/部署根展示），「Skills」（order -1）→ 技能面板
-  （四组导航、双半区大卡片、开关、删除、备注编辑、配置弹窗），「本地仓库」（order 0）→
-  本地仓库面板（多根目录管理、本地项目状态/同步/克隆、GitHub 镜像自动检测/严格更新、
-  Skill 仓库分组与应用到全局/项目/插件，指令写入当前输入框）。补丁面板开着时每 6 秒
-  现场轮询；提醒模式 B 下后台每 15 秒轮询并在按钮上显示丢失红点。
+  `dsh.client` 包同款），React 取自平台模块表，用同源 `fetch` 调用宿主路由；UI 包含四个
+  侧边栏按钮与四个面板——「补丁」（order -2）→ 补丁面板，「Skills」（order -1）→ 技能面板，
+  「本地仓库」（order 0）→ 本地仓库面板，「服务」（order 1）→ 服务面板
 - **通信面**：不走 Typert/Remote（那需要把描述符编译进部署的 `dsh-api-remotes`），
   而是与已内置的社区插件市场（dsh-webui-market-plugin）同款的自定义 webServer 路由。
-  宿主侧路由对所有请求做同源校验。
-- **备注存储**：`~/.dsh/skills-notes.json`（模型只读 `SKILL.md`，永远读不到该文件）。
+  宿主侧路由对所有请求做同源校验
+- **备注存储**：`~/.dsh/skills-notes.json`（模型只读 `SKILL.md`，永远读不到该文件）
 
 ## 安装（dsh plugin → pnpm 转发器）
 
-**仓库根目录携带当前最新版 tarball**（如 `deepseek-ai-dsh-manager-0.10.2.tgz`，随版本更新提交），
+**仓库根目录携带当前最新版 tarball**（如 `deepseek-ai-dsh-manager-0.35.5.tgz`，随版本更新提交），
 克隆仓库即可直接安装，无需自行打包：
 
 ```powershell
@@ -172,14 +253,14 @@ cd dsh-manager
 
 # 2) 装进 web profile（dsh plugin 会把参数原样转发给 profile 目录里的 pnpm，
 #    并在安装成功后自动把本包名追加进 dsh.profile.bundles）
-dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.10.2.tgz
+dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.35.5.tgz
 
 # 3) 重启 web（组合与 client-modules 扫描都发生在启动时）
 dsh web
 ```
 
-> 想从 GitHub 网页安装：打开仓库 → 点击 `deepseek-ai-dsh-manager-0.10.2.tgz` → Download →
-> 对下载文件执行 `dsh plugin --profile web add .\下载路径\deepseek-ai-dsh-manager-0.10.2.tgz`。
+> 想从 GitHub 网页安装：打开仓库 → 点击 `deepseek-ai-dsh-manager-0.35.5.tgz` → Download →
+> 对下载文件执行 `dsh plugin --profile web add .\下载路径\deepseek-ai-dsh-manager-0.35.5.tgz`。
 > 包名/版本会随更新变化，以仓库内实际 tgz 文件名为准。
 
 安装后 profile 里会发生：
@@ -189,22 +270,27 @@ dsh web
    `@deepseek-ai/dsh-manager`（由 `dsh plugin` 的 reconcile 步骤自动完成）；
 3. 启动时该 bundle 的 `cordis.patch.yml` 把行 `{ id: dsh-manager, name: '@deepseek-ai/dsh-manager' }`
    插入组合 → 宿主半边注册路由；`client-modules` 扫描到 `dsh.client` 声明后把
-   `lib/client.js` 作为 `/plugins/@deepseek-ai/dsh-manager/client.js` 注入 `window.__DSH_BOOT__`。
+   `lib/client.js` 作为 `/plugins/@deepseek-ai/dsh-manager/client.js` 注入 `window.__DSH_BOOT__`；
+4. 宿主半边启动时自动扫描 `skills/` 目录，把 6 个随包技能注册进技能注册表
+   （`registerPackagedSkills`：frontmatter 的 name/description/whenToUse/invocation 元数据透传，
+   逐条 try/catch 隔离，坏条目只 warn 不拖垮整体）。
 
 宿主依赖（`skills` / `sessions` / `agents` / `agentPresets` / `webServer`）全部由
 dsh-base + dsh-web-app bundle 提供；Node 侧模块解析走 `$DSH_HOME/profiles/node_modules`
-回退符号链接场。运行时 npm 依赖仅 `pinyin-pro`（由 profile 的 pnpm 随安装解析）；
+回退符号链接场。运行时 npm 依赖仅 `pinyin-pro` 与 `js-yaml`（由 profile 的 pnpm 随安装解析）；
 peerDependencies 仅作文档，`autoInstallPeers: false` 下不会被安装。
 
 ## 升级（直接加装，无需先删）
 
 ```powershell
 # 包名相同，装上更高版本 tgz 即覆盖升级（无需 remove）：
-dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.10.2.tgz
-# 重启 dsh web 生效（备注/回收站/补丁状态都在 ~/.dsh，与包无关，零损失）
+dsh plugin --profile web add .\deepseek-ai-dsh-manager-0.35.5.tgz
+# 重启 dsh web 生效（备注/回收站/补丁状态/观察记录都在 ~/.dsh 与 _governance，与包无关，零损失）
 ```
 
 > 仓库内 tgz 随版本更新；升级时以仓库根目录实际携带的最新 tgz 为准。
+> 版本纪律：每次发布**只增不覆盖**——新版本号只出现一次，历史版本归档于
+> `_governance/MANIFEST.md` 与本地 `_snapshots/`，不回写旧版本。
 
 ## 部署补丁（补丁面板为主通道，CLI 脚本为兜底）
 
@@ -262,17 +348,20 @@ powershell -ExecutionPolicy Bypass -File .\scripts\reapply-deployment-patches.ps
 
 ```powershell
 dsh plugin --profile web remove @deepseek-ai/dsh-manager
-# 重启 dsh web 生效
+# 重启 dsh web 生效（技能随包消失，本地数据如备注/补丁/治理账本均保留在 ~/.dsh 与 _governance）
 ```
 
 ## 挂载后验证
 
 1. 重启后宿主启动日志无本包报错（route 注册失败、client bundle 缺失都会 loud throw）；
-2. 刷新页面：侧边栏底部出现 **补丁** 与 **Skills** 两个按钮（补丁在 Skills 上方，Settings 上方同列）；
-3. 打开补丁面板确认补丁类别分组、状态徽标、启用/禁用/导入/删除/类别管理、提醒模式开关、
-   可执行总闸、部署根展示都正常；
-4. 打开 Skills 面板确认四组技能、Agent/用户开关、删除按钮、卡片下半区备注编辑、配置弹窗（保存/外部打开）都正常；
-5. 开/关开关与保存配置：现在直接落盘生效（0.2.0 起不再受模型面沙箱限制）。
+2. 刷新页面：侧边栏底部出现 **补丁 / Skills / 本地仓库 / 服务** 四个按钮；
+3. 打开 Skills 面板确认技能分组、Agent/用户开关、观察开关、删除按钮、备注编辑、配置弹窗正常，
+   且**随包 6 技能**（local-governance / dsh-repo-clone / dsh-review / service-config /
+   skill-optimize / dsh-plugin-lifecycle）出现在插件组；
+4. 打开补丁面板确认类别分组、状态徽标、启用/禁用/导入/删除/类别管理、提醒模式开关、可执行总闸正常；
+5. 打开本地仓库面板确认多根目录扫描、git 状态、GitHub 镜像分组、Skill 仓库分组正常；
+6. 打开服务面板确认服务识别/配置/启停/日志正常；
+7. 开/关开关与保存配置：直接落盘生效（不受模型面沙箱限制）。
 
 ## 行为语义（与底层 @deepseek-ai/dsh-skill 一致）
 
@@ -283,25 +372,25 @@ dsh plugin --profile web remove @deepseek-ai/dsh-manager
   内容只读，但 **0.8.6 起有配置文件路径的技能可在面板「解锁」后切换调用权限**（写回该技能文件，
   重装包后还原）；跨预设作用域的技能一律仅查看。
 - 备注仅用户可见：存于 `~/.dsh/skills-notes.json`，模型只读 `SKILL.md`，永远不会看到备注。
+- 观察约定块（`<!-- dsh-observe:start -->`…）：插件技能运行时注入（不污染包内文件）、
+  文件技能直改 SKILL.md 末尾；「启动优化检测」开关 off 时精确移除。
 
 ## 开发备注
 
-- `lib/` 是唯一源码；本包不依赖 TypeScript / 构建器，改完直接 `pnpm pack`。
+- `lib/` 是唯一源码；本包不依赖 TypeScript / 构建器，改完直接 `pnpm pack`（npm pack 在仓库目录执行）。
+- 模块划分：`index.js`（宿主 rpc + 技能/补丁/仓库/服务编排）、`client.js`（浏览器 UI）、
+  `service-core.js`（服务引擎）、`repo-core.js`（仓库引擎，含 repoScan 缓存）、
+  `ai-core.js`（AI 讲解引擎）。
+- `skills/` 注册约定（0.34.5+）：目录即真相——新增随包技能只需建 `skills/<name>/SKILL.md`，
+  自动扫描注册；frontmatter 元数据（name/description/whenToUse/invocation/resourceBase）逐项透传。
 - `scripts/smoke-test.mjs`（不打包进 tarball）：真实 cordis Context + mock 注册表 + 真实磁盘写入的
-  **168 项断言**冒烟测试，覆盖全部方法与 404/403 路径。技能管理 46 项断言（含拼音字段、回收站、
-  备注、只读来源拒绝等）；补丁引擎第 9 节 66 项断言覆盖目录驱动全链路：目录与示例补丁（含目标文件
-  路径 targets 字段）/ 启用禁用往返 /
-  收养 / 多文件事务 / 干跑回滚 / 同文件链共存与重叠冲突 / 前置互斥 / override / script 可执行总闸 /
-  类别与删除 / 丢失态 / RECOVERY 手册与设置。运行方式见脚本头注释（需把包复制进
-  `$DSH_HOME/profiles/node_modules` 模拟安装解析链）。
+  **冒烟测试**，覆盖技能管理（拼音字段、回收站、备注、只读来源拒绝）、补丁引擎全链路（目录驱动/
+  启用禁用往返/收养/多文件事务/干跑回滚/链共存/前置互斥/override/script 总闸/类别/丢失态/
+  RECOVERY.md）、仓库与服务引擎。运行方式见脚本头注释。
 - `scripts/trial-boot.ps1` 是一次性 DSH_HOME 试装验证脚本（不打包进 tarball）：真实执行
-  `dsh plugin --profile web add <tgz>` → 启动 web profile → 校验 ready 行、client bundle 服务
-  （版本标记 + 别名源 + 拼音 + 缓存 + 补丁面板代码标记）、部署两个补丁的标记、boot manifest
-  注入、catalog 路由、跨源拒绝、notes 往返落盘（含拼音字段）、delete 端点，以及目录驱动补丁引擎的
-  **patchScan 收养判定 / 禁用启用往返（不重启服务器直接抓 bundle 验证"刷新即生效"）/
-  类别与导入/缺失目标拒绝启用/删除/RECOVERY.md/设置往返**，全部通过后清理临时目录。
+  `dsh plugin --profile web add <tgz>` → 启动 web profile → 校验 ready 行、client bundle 服务、
+  部署补丁标记、boot manifest 注入、catalog 路由、跨源拒绝、notes 往返落盘，全部通过后清理临时目录。
 - 部署补丁 CLI 脚本 `scripts/reapply-deployment-patches.ps1`（纯 ASCII、幂等、自保护、原子写）：
-  无参数查状态、`-restore` 一键还原官方快照、`-apply` 重打 clean 补丁——补丁面板的 CLI 兜底，
-  见上文「部署补丁」。
+  无参数查状态、`-restore` 一键还原官方快照、`-apply` 重打 clean 补丁——补丁面板的 CLI 兜底。
 - 升级安装同一 tarball 的新版本后重启即可；`dsh plugin` 会在每次 add/update 后重新 reconcile bundle 列表。
 - 通信路由 `/api/dsh-manager` 与宿主路由同源校验逻辑见 `lib/index.js` 末尾注释。

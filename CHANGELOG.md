@@ -7,6 +7,9 @@
 ## 0.35.5 - 2026-08-22 - fix
 - Skills 面板秒显缓存持久化（修复 0.35.4 缓存易失）：`skillCatalogCache` 落 sessionStorage（标签页级，key `dsh-manager:skillCatalogCache:v1`）——页面/标签页重载后 apply 重建、内存态缓存归零导致秒显失效（实测重开 Skills 面板变空白 1-3s 才填充），持久化后刷新仍可秒显旧数据再后台刷新；读写均 try/catch 防存储不可用（隐私模式/iframe 限制）；缓存 key 含 v1 版本号防结构漂移；会话/工作目录变化 key 不匹配仍自动失效，reloadTick 仍强制重拉。
 
+## 0.35.5 - 2026-08-22 - docs
+- README.md 全面审查更新（GitHub 仓库文档过时）：补齐 0.9.0–0.35.x 全部能力——新增「随包技能集（6 技能）」「本地仓库面板」「服务面板」「治理体系」四章，Skills 管理章补观察开关与秒显缓存，安装/升级章版本号 0.10.2 → 0.35.5，宿主 rpc 方法清单更新为当前约 60 个（含 skillObserve*/repo*/service*/aiExplain*），目录结构补 skills/、examples/、lib 五文件，挂载验证补四个按钮与随包技能检查。纯文档，无行为变更。
+
 ## 0.35.4 - 2026-08-22 - feat
 - Skills 面板秒显缓存（前端）：catalog 快照按 (sessionId, cwd) 缓存（`skillCatalogCache`）——面板重开先秒显上次数据再后台刷新，消除组件卸载导致的 50-150ms 白屏等待；会话/工作目录变化时缓存 key 不匹配自动失效；reloadTick 刷新按钮仍强制重拉。
 
