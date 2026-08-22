@@ -4,6 +4,9 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.35.7 - 2026-08-22 - feat
+- 本地仓库面板「拉取更新」镜像模板 v3（writing-for-agents 二审后重构）：upstream 缺失自动补配（按 repos.json 该条目 upstream 字段，与 origin 同址）；reset 前工作区脏检查守卫（mirror 纪律，非空停下待裁决）；版本标识统一取法与格式（git describe --tags > VERSION/version 文件 > 短 SHA，格式「<版本>[+N] (<短SHA>)」）；更新总结上提为无条件步骤（不再挂在装配分支下）；治理落账字段明确（repos.json 顶层 updatedAt + lastChecked/lastSync/notes 前置摘要，REPOS.md 用 UTC+8 时间）；装配判定短路化（MANIFEST/profile 均无则跳过）；装配升级按 MANIFEST「装配方式」四分支（file: tgz / link: 直连 / registry 固定版本 / 目录复制预设），收尾统一 dev_reload_package 或重启 DSH 并询问审核；流程 I 入队格式固化（id=<repo>-sync-<日期>，type=registry）；汇报扩为四段（新增治理落账清单）。
+
 ## 0.35.6 - 2026-08-22 - feat
 - 本地仓库面板「拉取更新」模板完善（镜像全链路）：指令从纯 git 更新扩展为「镜像更新 → 装配检查 → 装配升级 → 更新总结」——更新镜像后自动判断项目是否为已装配插件（读 _governance/MANIFEST.md 与 profile package.json 的 dependencies/dsh.profile.bundles + dev_plugin_status）；已装配且版本变化则按 local-governance 流程 A/B 构建/tgz 快照/profile 切换/pnpm 重装/热重载或重启并更新 MANIFEST，用 git log 旧HEAD..新HEAD 总结更新内容；按流程 I 镜像同步静默入队，装配升级完成后询问立即审核或推迟；未装配则仅汇报镜像同步结果。
 

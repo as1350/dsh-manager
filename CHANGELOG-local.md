@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-22 - feat（随 0.35.7 发布，明细见 CHANGELOG.md）
+- 本地仓库面板「拉取更新」镜像模板 v3 重构：upstream 补配/脏区守卫/版本标识规范/总结无条件化/治理字段明确/装配四分支/收尾归位/入队格式固化/四段汇报。
+
 ## 2026-08-22 - feat（随 0.35.6 发布，明细见 CHANGELOG.md）
 - 本地仓库面板「拉取更新」镜像模板完善：镜像更新后自动检查是否已装配插件（MANIFEST + profile dependencies/bundles + dev_plugin_status），是则按 local-governance 流程 A/B 升级装配并总结更新内容（git log 旧..新），按流程 I 静默入队（registry）且装配升级后询问审核。
 
