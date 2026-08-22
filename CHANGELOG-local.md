@@ -3,6 +3,13 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-22 - feat（随 0.34.4–0.34.8 发布，明细见 CHANGELOG.md）
+- 0.34.4：修复包内技能注册白名单漏登 dsh-repo-clone（PACKAGED 补登；版本只增不覆盖）。
+- 0.34.5：包内技能注册改自动扫描 skills/ 目录（目录即真相，替代硬编码白名单；readdirSync + splitFrontmatter/parseFrontmatterMeta，逐条 try/catch 隔离）。
+- 0.34.6：复核后修复注册透传 frontmatter 元数据（invocation 的 disable-model-invocation/user-invocable、whenToUse、resourceBase 基准目录；meta 解析兼容 BOM/CRLF、description 空串回退）。
+- 0.34.7：dsh-plugin-lifecycle 恢复模型自动调用（移除 disable-model-invocation，保留 user-invocable:false → 仅模型可调用）。
+- 0.34.8：新增 dsh-review 审核技能 + 待审核队列机制（_governance/pending-reviews.json 种子 0.34.6/0.34.7；local-governance 铁律 9/待审核提醒/流程 I 询问钩子；dsh-repo-clone 步骤 5 克隆静默入队）。
+
 ## 2026-08-22 - feat（随 0.34.3 发布，明细见 CHANGELOG.md）
 - ⋯ 菜单边界检测自动翻转修复：以最近滚动容器可视矩形为测量基准 + `.skm-menu-up` 翻转 + 两侧不足时限高滚动；「打开」按钮改「管理页面」文案且未运行时置灰。
 - 新增插件技能 `dsh-repo-clone`（skills/dsh-repo-clone）：克隆远端仓库标准流程——代理检查（已设直接用/未设问端口）→ 克隆（schannel SEC_E_NO_CREDENTIALS 时 `-c http.sslBackend=openssl` 单次重试）→ 校验（log/branch/submodule）→ 按 local-governance 流程 G 入账。
