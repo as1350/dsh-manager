@@ -4,6 +4,15 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.34.6 - 2026-08-22 - fix
+- 复核 0.34.5 扫描改造（全角度审查 + 二审剔除虚假问题后）修复包内技能注册的 frontmatter 元数据丢失：
+  - **invocation 透传**：此前注册忽略 frontmatter 的 `disable-model-invocation` / `user-invocable`，一律落默认 `{modelInvocable:true, userInvocable:true}`——`dsh-plugin-lifecycle`（作者意图 user-invoked）被错误地变为模型可自动调用、`service-config` 的 `user-invocable:false` 失效。现解析两字段：`disable-model-invocation: true` → `modelInvocable:false`（仅用户显式调用）；`user-invocable: false` → `userInvocable:false`（仅模型自动路由）。
+  - **resourceBase 补传**：注册新增 `resourceBase: {kind:'directory', path:<技能目录>}`，修复 `dsh-plugin-lifecycle` 正文相对引用 `REFERENCE.md` 加载时无基准目录的问题（此前加载提示只有“provider 管理资源”，模型无法解析相对路径）。
+  - **whenToUse 透传**：frontmatter 的 whenToUse 随注册进入目录摘要（catalog 本就支持该字段，此前被丢弃）。
+  - **frontmatter 解析健壮性**：meta 改从 `splitFrontmatter` 的 fm 行解析（兼容 BOM/CRLF），替代 `parseFrontmatterMeta` 的 `^---\n` 正则——CRLF/BOM 文件此前整段失配、description 静默回退成技能名；description 空串回退 name，避免 `validateRuntimeSkill` 抛「requires a description」吞掉整条注册。
+  - 行为影响：修复后 `dsh-plugin-lifecycle` 按作者意图变为 user-invoked（不再出现在模型自动目录，用户显式调用仍可用）；`service-config` 保持模型可见、用户显式调用被拒；`dsh-repo-clone` / `local-governance` 无相关字段，行为不变。
+- 历史定性：以上均为 0.8.0 引入 `registerPackagedSkills` 以来的遗留（非 0.34.5 回归），本次随复核一并修正；安装副本与源码 hash 一致、版本四件套一致等已核项未见问题。
+
 ## 0.34.5 - 2026-08-22 - feat
 - 包内技能注册从硬编码白名单改为**自动扫描** `skills/` 直接子目录（目录即真相）：`registerPackagedSkills` 不再维护 `PACKAGED` 数组，改为 `readdirSync` 枚举 + 逐目录读 `SKILL.md`，注册名取 `frontmatter.name ?? 目录名`，按名排序注册。
   - 新增包内技能只需建目录 `skills/<name>/SKILL.md`，无需第二处登记（根治 0.34.3 漏登白名单类问题）；
