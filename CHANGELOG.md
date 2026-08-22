@@ -4,6 +4,11 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.35.3 - 2026-08-22 - feat
+- 本地仓库面板首开提速（启动预热）：host `apply()` 启动时后台预热 `repoScan` SWR 缓存（fire-and-forget，不阻塞启动）——浏览器启动后**首次**打开面板直接命中缓存，7-8s 全量扫描等待变为秒开（此前缓存只在面板打开过之后才存在，冷启动首开必全量）。
+- `refreshRepoScanInBackground` 返回进行中的 promise + `repoScanRefreshPromise`：缓存未就绪但预热/后台刷新进行中时，`repoScan` handler 等待同一次构建（防止启动预热与首开面板双路并行全量扫描）。
+- 代价：每次启动一次异步全量扫描；会话内不打开面板时该次扫描白费（可接受）。不改 F4-4 前端按需加载决策，不改变 0.35.1 force 强制重扫语义。
+
 ## 0.35.2 - 2026-08-22 - feat
 - 技能观察与自优化机制（grilling 方案落地）：
   - host：新增 `skillObserveGet/Set/List` rpc + `_governance/skill-observations.json` 单一事实源（version 1，skills 按名索引：observing/enabledAt/disabledAt/optimizedAt/revision/entries，pendingSuggestions 实时计算，entries 复盘内容由 agent 写入、host 原样保留）；
