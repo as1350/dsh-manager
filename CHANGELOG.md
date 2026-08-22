@@ -4,6 +4,9 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.34.4 - 2026-08-22 - fix
+- 修复 0.34.3 遗漏：包内技能注册白名单（`registerPackagedSkills` 的 `PACKAGED` 数组）未加入 `dsh-repo-clone`，导致新技能虽随包分发但从未注册进运行时技能表，Skills 面板与 agent 技能目录均不可见。补登白名单条目并同步 client VERSION。
+
 ## 0.34.3 - 2026-08-22 - feat
 - 新增插件技能 `dsh-repo-clone`（`skills/dsh-repo-clone/SKILL.md`）：克隆远端仓库并登记治理账本的标准流程——①代理检查（已设置直接用，缺失先问用户软件名与端口再设 global proxy）②克隆（默认 `--recurse-submodules`；遇 schannel `SEC_E_NO_CREDENTIALS` 加 `-c http.sslBackend=openssl` 单次重试）③校验（最新提交/分支/submodule status）④按 local-governance 流程 G 写 repos.json + REPOS.md（schema 单一事实源在 local-governance，不重复定义）。
 - 本地仓库面板「拉取新Github项目」指令模板改为技能引用：内联的代理决策树与登记字段要求移入技能，模板只携带任务参数（仓库地址/识别类型/目标目录/当前代理），消除模板与技能的双份维护。
