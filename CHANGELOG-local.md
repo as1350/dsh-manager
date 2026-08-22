@@ -3,6 +3,10 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-22 - feat（随 0.35.0 发布，明细见 CHANGELOG.md）
+- 本地仓库面板 repoScan SWR 缓存（15s TTL，过期先回旧值后台重扫）——根治每次打开面板 7-8s 全量重扫。
+- dsh-repo-clone 新增步骤 6：克隆后快速分析（项目摘要）+ DSH 插件判定 + 询问用户是否装配。
+
 ## 2026-08-22 - docs（随 0.34.9 发布，明细见 CHANGELOG.md）
 - dsh-review 技能按 writing-for-agents 规范重构：触发词收敛（审核/复核）、删除与 local-governance 流程 I 重复的入队规则、步骤 2/3 判据补齐、否定式改正面表述；行为零变化。
 

@@ -28,10 +28,19 @@ description: 克隆远端 Git/GitHub 仓库到本地 DSH 目录树并登记治�
 
 5. **队列登记**：克隆属登记类变更，按 **dsh-review** 技能的队列约定**静默入队**——
    向 `_governance/pending-reviews.json` 追加一条 `type=clone` 记录（字段 schema 以 dsh-review 为准），**不询问**用户。
+6. **快速分析 + 装配询问**（克隆完成后必做）：
+   - 快速查看项目：读 `package.json`（name/description/`dsh` 字段/peerDependencies）、README 头部、检查
+     `cordis.patch.yml` 与 `lib/` 入口，输出 3–5 行摘要（项目类型 / 用途 / 技术栈 / 是否 DSH 插件）；
+   - **DSH 插件判定**（满足任一即视为 DeepSeek Harness 相关插件）：
+     `package.json` 含 `dsh` 配置（`dsh.bundle` / `dsh.client`）｜存在 `cordis.patch.yml`｜
+     peerDependencies 含 `@deepseek-ai/cordis`｜代码出现 `window.__ModuleLoader__` 或 `ctx.effect` 插件生命周期；
+   - 是 DSH 插件 → **询问用户是否装配**：按 local-governance 装配流程执行（`link:` 直连克隆目录，或构建后
+     `file: tgz` 快照入库），用户确认后装配并更新 MANIFEST.md；
+   - 不是 DSH 插件 → 汇报摘要即可，不询问装配。
 
 ## 完成判据
 
-目录实况（最新提交 / 分支 / 子模块）= repos.json 条目 = REPOS.md 行，三者一致；且克隆已静默入队（pending-reviews.json 有本次记录）。
+目录实况（最新提交 / 分支 / 子模块）= repos.json 条目 = REPOS.md 行，三者一致；且克隆已静默入队（pending-reviews.json 有本次记录）；克隆已完成快速分析，DSH 插件已按用户选择装配或明确不装配。
 
 ## 环境事实
 
