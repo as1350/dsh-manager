@@ -4,6 +4,13 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.34.8 - 2026-08-22 - feat
+- 更新后审核机制：新增 `dsh-review` 技能——待审核队列消费方与 schema 单一事实源（`_governance/pending-reviews.json`），四步审核流程（一审全角度 → 二审源码证伪 → 修复前评估 → 修复验证 + 队列更新），步骤 0 读队列让用户按需选审核范围（当前/全部/指定 id）。
+- local-governance 技能：新增铁律 9「更新后审核钩子」+「待审核提醒」小节 + 流程 I「更新后审核钩子」——代码/配置变更或发版完成后主动询问"立即审核 / 推迟入队"；登记/克隆类静默入队不询问；本技能每次被调用时顺带提醒待审核数。
+- dsh-repo-clone 技能：步骤 5 新增队列登记——克隆完成按 dsh-review 约定静默入队（type=clone），不询问。
+- 队列种子：`_governance/pending-reviews.json` 预置 0.34.6、0.34.7 两条 `status=pending` 记录（可立即体验审核流程，作为审计起点）。
+- 包内技能注册无需改代码：自动扫描（0.34.5+）约定下，skills/ 放目录即注册。
+
 ## 0.34.7 - 2026-08-22 - fix
 - dsh-plugin-lifecycle 恢复模型自动调用：SKILL.md frontmatter 移除 `disable-model-invocation: true`。0.34.6 起注册开始解析 invocation 后，该行与 `user-invocable: false` 组合成双禁（modelInvocable:false + userInvocable:false），技能完全不可达；移除后为仅模型自动调用（`user-invocable: false` 保留——用户显式调用仍不可用，需要时可再移除该行）。镜像副本（skill仓库 `plugins\dsh-manager\dsh-plugin-lifecycle\SKILL.md`）已同步。
 

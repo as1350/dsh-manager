@@ -26,9 +26,12 @@ description: 克隆远端 Git/GitHub 仓库到本地 DSH 目录树并登记治�
    - 字段值域、notes 惯例、updatedAt 一律以 local-governance 为准；
    - 写完校验 repos.json 仍可被 JSON 解析。
 
+5. **队列登记**：克隆属登记类变更，按 **dsh-review** 技能的队列约定**静默入队**——
+   向 `_governance/pending-reviews.json` 追加一条 `type=clone` 记录（字段 schema 以 dsh-review 为准），**不询问**用户。
+
 ## 完成判据
 
-目录实况（最新提交 / 分支 / 子模块）= repos.json 条目 = REPOS.md 行，三者一致。
+目录实况（最新提交 / 分支 / 子模块）= repos.json 条目 = REPOS.md 行，三者一致；且克隆已静默入队（pending-reviews.json 有本次记录）。
 
 ## 环境事实
 

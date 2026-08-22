@@ -30,7 +30,14 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 5. **自检**：更新账本后检查列数一致、版本号格式 `^\d+\.\d+\.\d+$`、归档路径存在。
 6. **版本只增不覆盖**：任何已打包/已装配的包发生代码或功能变更（含修复、文案、UI 调整）后，必须递增版本号——新增功能/接口/面板 → 次版本；缺陷修复/文案/小调整 → 修订版本。**禁止原地覆盖同名 tgz**；每次 bump 后重新走 A/B 流程并同步 MANIFEST/README/profile。
 7. **本地改动必登记**：任何受管仓库发生本地改动（代码/UI/配置/文档）后，必须在该仓库根目录 `CHANGELOG-local.md` 登记对应 commit（`### [commit <hash>] <标题>`），否则视为未完成；
-8. **分支与同步纪律**：本地改动提交到本地维护分支（如 `local-custom`），不直接改 `main/master`；拉取上游用 `git pull --rebase <远端> <上游分支>`（本项目惯例 `git pull --rebase origin main`），冲突停下问用户并在文档笔记段记录。
+8. **分支与同步纪律**：本地改动提交到本地维护分支（如 `local-custom`），不直接改 `main/master`；拉取上游用 `git pull --rebase <远端> <上游分支>`（本项目惯例 `git pull --rebase origin main`），冲突停下问用户并在文档笔记段记录；
+9. **更新后审核钩子**：任何代码/配置变更或发版完成后，按 **dsh-review** 技能规则**主动询问**用户"立即审核 / 推迟入队"；登记/克隆类变更**静默入队不询问**；本技能每次被调用时先检查待审核队列并顺带提醒待审核数。
+
+## 待审核提醒（每次进入本技能先做）
+
+1. 读 `_governance/pending-reviews.json`；
+2. 存在 `status=pending` 的项 → 顺带提醒："还有 **N** 项待审核更新（最早：<summary>），说『审核』即可开始"；
+3. 队列 schema 单一事实源 = **dsh-review** 技能，本技能只读提醒数与追加条目，不复述字段。
 
 ## 标准流程
 
@@ -143,6 +150,18 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 8. 按仓库面板要求更新 `lastSync` / `REPOS.md`（如适用）。
 
 **完成判据**：每一个本地业务 commit 都能在 `CHANGELOG-local.md` 找到对应登记；本地维护分支已推送；上游同步完成后无未解决冲突。
+
+### I. 更新后审核钩子（待审核队列）
+
+在**任何更新落地后**执行（含流程 A/B/D/E 发版、流程 H 本地修改、本地仓库面板指令中的代码/配置变更）：
+
+1. **判断变更类型**：
+   - 代码/配置变更或发版（release / patch / code-change）→ 主动询问用户："本次更新（<summary>）是否立即审核？我可以按 dsh-review 执行；或推迟记入待审核队列。"
+   - 登记/克隆类（registry / clone）→ **不询问**，直接静默入队。
+2. **按用户选择**：
+   - 立即审核 → 加载 dsh-review 技能，按其中四步流程执行本次审核；
+   - 推迟 → 按 dsh-review 队列 schema 追加一条 `status=pending` 记录（id/type/summary/repo/repoId/commits/fromVersion/toVersion/createdAt），写回 pending-reviews.json 并更新 `updatedAt`；
+3. 队列写入后不需要额外提醒——后续本技能被调用时"待审核提醒"会顺带展示数量。
 
 ## 环境事实（勿重复探测）
 
