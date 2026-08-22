@@ -4,6 +4,12 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.34.3 - 2026-08-22 - feat
+- 新增插件技能 `dsh-repo-clone`（`skills/dsh-repo-clone/SKILL.md`）：克隆远端仓库并登记治理账本的标准流程——①代理检查（已设置直接用，缺失先问用户软件名与端口再设 global proxy）②克隆（默认 `--recurse-submodules`；遇 schannel `SEC_E_NO_CREDENTIALS` 加 `-c http.sslBackend=openssl` 单次重试）③校验（最新提交/分支/submodule status）④按 local-governance 流程 G 写 repos.json + REPOS.md（schema 单一事实源在 local-governance，不重复定义）。
+- 本地仓库面板「拉取新Github项目」指令模板改为技能引用：内联的代理决策树与登记字段要求移入技能，模板只携带任务参数（仓库地址/识别类型/目标目录/当前代理），消除模板与技能的双份维护。
+- 随版收编本日早前本地改动（原登记 CHANGELOG-local）：⋯ 菜单边界检测自动翻转（滚动容器矩形基准 + 翻转 + 限高滚动）；「打开」按钮改「管理页面」文案且未运行时置灰。
+- 环境：全局 `git config --global http.sslBackend openssl` 根治 schannel 经本地代理握手失败；技能内保留单次 `-c` 应急分支作保险丝。
+
 ## 0.34.2 - 2026-08-22 - fix
 - 代码审查 75 项发现的落地修复（审查文档：`D:\Desktop\Dsh\总结文档\dsh-manager-代码审查总结.md` / `dsh-manager-修复报告.md`）：
   - S1×6 全部修复：F1-1 COMPANION_RE 收紧（禁 `.` / `..` 路径穿越）、F1-2 移除快照共享破坏的无条件 deleteSnapshot、F2-1 日志流 error 监听、F2-2 外部进程匹配收紧（cwd>3 + 词边界 + name≥5）、F3-1 safeSkillName 校验、F3-2 只读 .env.example。
