@@ -4,6 +4,9 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.35.6 - 2026-08-22 - feat
+- 本地仓库面板「拉取更新」模板完善（镜像全链路）：指令从纯 git 更新扩展为「镜像更新 → 装配检查 → 装配升级 → 更新总结」——更新镜像后自动判断项目是否为已装配插件（读 _governance/MANIFEST.md 与 profile package.json 的 dependencies/dsh.profile.bundles + dev_plugin_status）；已装配且版本变化则按 local-governance 流程 A/B 构建/tgz 快照/profile 切换/pnpm 重装/热重载或重启并更新 MANIFEST，用 git log 旧HEAD..新HEAD 总结更新内容；按流程 I 镜像同步静默入队，装配升级完成后询问立即审核或推迟；未装配则仅汇报镜像同步结果。
+
 ## 0.35.5 - 2026-08-22 - fix
 - Skills 面板秒显缓存持久化（修复 0.35.4 缓存易失）：`skillCatalogCache` 落 sessionStorage（标签页级，key `dsh-manager:skillCatalogCache:v1`）——页面/标签页重载后 apply 重建、内存态缓存归零导致秒显失效（实测重开 Skills 面板变空白 1-3s 才填充），持久化后刷新仍可秒显旧数据再后台刷新；读写均 try/catch 防存储不可用（隐私模式/iframe 限制）；缓存 key 含 v1 版本号防结构漂移；会话/工作目录变化 key 不匹配仍自动失效，reloadTick 仍强制重拉。
 
