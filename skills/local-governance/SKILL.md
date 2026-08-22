@@ -33,11 +33,12 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 8. **分支与同步纪律**：本地改动提交到本地维护分支（如 `local-custom`），不直接改 `main/master`；拉取上游用 `git pull --rebase <远端> <上游分支>`（本项目惯例 `git pull --rebase origin main`），冲突停下问用户并在文档笔记段记录；
 9. **更新后审核钩子**：任何代码/配置变更或发版完成后，按 **dsh-review** 技能规则**主动询问**用户"立即审核 / 推迟入队"；登记/克隆类变更**静默入队不询问**；本技能每次被调用时先检查待审核队列并顺带提醒待审核数。
 
-## 待审核提醒（每次进入本技能先做）
+## 顺带提醒（每次进入本技能先做）
 
-1. 读 `_governance/pending-reviews.json`；
-2. 存在 `status=pending` 的项 → 顺带提醒："还有 **N** 项待审核更新（最早：<summary>），说『审核』即可开始"；
-3. 队列 schema 单一事实源 = **dsh-review** 技能，本技能只读提醒数与追加条目，不复述字段。
+1. 读 `_governance/pending-reviews.json`：存在 `status=pending` 的项 → 提醒"还有 **N** 项待审核更新（最早：<summary>），说『审核』即可开始"；
+2. 读 `_governance/skill-observations.json`：存在 `pendingSuggestions > 0` 的技能 → 提醒"**M** 个技能有待处理优化建议（<技能名>…），说『优化』即可进入 skill-optimize"；
+3. 两类提醒合并成一句话顺带说出，不打断主流程；
+4. 队列 schema 单一事实源 = **dsh-review** 技能；观察记录 schema 单一事实源 = **skill-optimize** 技能；本技能只读计数与追加条目，不复述字段。
 
 ## 标准流程
 

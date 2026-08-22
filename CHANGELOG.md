@@ -4,6 +4,15 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.35.2 - 2026-08-22 - feat
+- 技能观察与自优化机制（grilling 方案落地）：
+  - host：新增 `skillObserveGet/Set/List` rpc + `_governance/skill-observations.json` 单一事实源（version 1，skills 按名索引：observing/enabledAt/disabledAt/optimizedAt/revision/entries，pendingSuggestions 实时计算，entries 复盘内容由 agent 写入、host 原样保留）；
+  - 注入分层：插件技能（source=custom, provider=dsh-manager）= 注册时运行时注入观察约定块——`registerPackagedSkills` 增加注册状态 registry，`skillObserveSet` 对插件技能**先 dispose 旧注册再重注册**（dsh-skill register 同名 first-wins，不能直接覆盖），开关即时生效、不污染包内 SKILL.md；文件技能（EDITABLE_SOURCES 且有 path）= 开关 on/off 直接改 SKILL.md 追加/移除 `<!-- dsh-observe:start -->` 约定块（幂等、精确匹配）；
+  - client：Skill 面板每张技能卡片新增「观察」开关（默认全关），乐观更新 + 失败提示，catalog 行透传 observing/pendingSuggestions；
+  - 新增包内技能 `skill-optimize`：观察记录消费与优化落地——读队列 → 加载 writing-for-agents 判据 → 逐条去噪（no-op/单次过拟合/重复/相关性丧失，剔除必给原因）→ 合并同类出最小方案 → 用户确认 → 落地（插件走 local-governance 发版、全局/项目直改文件、保留观察约定块）→ 验证 → 写回 handled/optimizedAt/revision；
+  - local-governance：「待审核提醒」扩展为「顺带提醒」——待审核数 + 待优化建议数合并一句话提醒；
+  - 种子：`_governance/skill-observations.json` 预置当前全部技能 observing:false。
+
 ## 0.35.1 - 2026-08-22 - fix
 - 0.35.0 审核修复：`repoScan` SWR 缓存支持 `{ force: true }` 强制重扫——reload 刷新按钮与 `repoInvalidate`（服务面板注册状态变更→仓库面板重扫）路径改走强制刷新，恢复「用户主动刷新 / 注册变更后必须拿到最新数据」的原语义（此前 15s 缓存会吞掉刷新意图，角标最长滞后 15s）。
 

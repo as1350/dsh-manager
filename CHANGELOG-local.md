@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-22 - feat（随 0.35.2 发布，明细见 CHANGELOG.md）
+- 技能观察与自优化机制：skillObserveGet/Set/List rpc + _governance/skill-observations.json 单一事实源；插件技能运行时注入观察约定块（注册 registry + 先 dispose 再重注册，即时生效）；文件技能直改 SKILL.md 追加/移除约定块；Skill 面板卡片「观察」开关；新增 skill-optimize 技能（去噪评估/最小方案/用户确认/落地/写回）；local-governance 顺带提醒扩展（待审核 + 待优化合并）；种子全技能 observing:false。
+
 ## 2026-08-22 - fix（随 0.35.1 发布，明细见 CHANGELOG.md）
 - 0.35.0 审核修复：repoScan 缓存支持 force 强制重扫（reload 按钮 / repoInvalidate 路径恢复原语义）。
 
