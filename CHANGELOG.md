@@ -4,6 +4,12 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.34.5 - 2026-08-22 - feat
+- 包内技能注册从硬编码白名单改为**自动扫描** `skills/` 直接子目录（目录即真相）：`registerPackagedSkills` 不再维护 `PACKAGED` 数组，改为 `readdirSync` 枚举 + 逐目录读 `SKILL.md`，注册名取 `frontmatter.name ?? 目录名`，按名排序注册。
+  - 新增包内技能只需建目录 `skills/<name>/SKILL.md`，无需第二处登记（根治 0.34.3 漏登白名单类问题）；
+  - 扫描约定与 `discoverPresetSkillPreviews` / 官方 `dsh-skill-filesystem` 一致：depth=1 只认 `SKILL.md`，逐条 try/catch 隔离，坏条目仅 warn 不拖垮整体；
+  - 注册通道不变（`ctx.get('skills').register()` runtime 注入 + `ctx.effect` 生命周期清理），技能位置/打包/分发链路不变。
+
 ## 0.34.4 - 2026-08-22 - fix
 - 修复 0.34.3 遗漏：包内技能注册白名单（`registerPackagedSkills` 的 `PACKAGED` 数组）未加入 `dsh-repo-clone`，导致新技能虽随包分发但从未注册进运行时技能表，Skills 面板与 agent 技能目录均不可见。补登白名单条目并同步 client VERSION。
 
