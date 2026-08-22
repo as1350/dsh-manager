@@ -4,6 +4,10 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.35.8 - 2026-08-22 - fix
+- 观察开关跨会话/跨进程失效修复（用户报告：另一个会话开的开关，本会话不生效）：根因是注入只落在切换会话视图解析出的单一目标上（插件技能=进程内存重注册、跨进程丢失；文件技能=只改 definition.path），启动补注循环也只覆盖包内注册，同名技能在别的会话被用户文件副本（~/.agents/skills 等 user-agents 源，first-wins 可能压过包内注册）摘下时约定块永远缺失。修复：观察状态以账本（skill-observations.json）为唯一事实源，文件副本成为同步层——新增 `syncObserveBlockInCopies`：启动时按账本对全部候选副本（~/.dsh/skills/<name>/SKILL.md、~/.agents/skills/<name>/SKILL.md、<cwd>/.dsh/skills/<name>/SKILL.md）幂等补（observing=true）/删（observing=false）约定块；`skillObserveSet` 对插件技能与文件技能均同步全部候选副本并返回 `files` 字段。任何会话/进程服务到的正文观察状态与账本一致。
+- 本地服务面板滚动条与弹性布局修复：在 .skm-content CSS 类中增加 min-height: 0，解决当配置项目/服务数量较多（如 4 个以上项目或服务卡片）时，由于 Flex 容器未限制最小高度导致最下方服务条目（如 sub2api-backend）被弹窗框截断且无法触发纵向滚动的 Bug。
+
 ## 0.35.7 - 2026-08-22 - feat
 - 本地仓库面板「拉取更新」镜像模板 v3（writing-for-agents 二审后重构）：upstream 缺失自动补配（按 repos.json 该条目 upstream 字段，与 origin 同址）；reset 前工作区脏检查守卫（mirror 纪律，非空停下待裁决）；版本标识统一取法与格式（git describe --tags > VERSION/version 文件 > 短 SHA，格式「<版本>[+N] (<短SHA>)」）；更新总结上提为无条件步骤（不再挂在装配分支下）；治理落账字段明确（repos.json 顶层 updatedAt + lastChecked/lastSync/notes 前置摘要，REPOS.md 用 UTC+8 时间）；装配判定短路化（MANIFEST/profile 均无则跳过）；装配升级按 MANIFEST「装配方式」四分支（file: tgz / link: 直连 / registry 固定版本 / 目录复制预设），收尾统一 dev_reload_package 或重启 DSH 并询问审核；流程 I 入队格式固化（id=<repo>-sync-<日期>，type=registry）；汇报扩为四段（新增治理落账清单）。
 

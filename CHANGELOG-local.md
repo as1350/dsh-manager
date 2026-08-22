@@ -3,6 +3,10 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-22 - fix（随 0.35.8 发布，明细见 CHANGELOG.md）
+- 观察开关跨会话/跨进程失效修复：观察状态以账本为唯一事实源，文件副本成为同步层（新增 `skillCopyCandidates` + `syncObserveBlockInCopies`）——启动时按账本对 ~/.dsh/skills、~/.agents/skills、<cwd>/.dsh/skills 全部同名副本幂等补/删约定块，skillObserveSet 对插件/文件技能均同步全部候选副本（返回 files）；根治 first-wins 注册被用户副本摘下时约定块缺失。
+- Skills 面板滚动条与弹性布局修复（.skm-content min-height: 0）。
+
 ## 2026-08-22 - feat（随 0.35.7 发布，明细见 CHANGELOG.md）
 - 本地仓库面板「拉取更新」镜像模板 v3 重构：upstream 补配/脏区守卫/版本标识规范/总结无条件化/治理字段明确/装配四分支/收尾归位/入队格式固化/四段汇报。
 
