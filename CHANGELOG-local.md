@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-22 - docs（随 0.34.9 发布，明细见 CHANGELOG.md）
+- dsh-review 技能按 writing-for-agents 规范重构：触发词收敛（审核/复核）、删除与 local-governance 流程 I 重复的入队规则、步骤 2/3 判据补齐、否定式改正面表述；行为零变化。
+
 ## 2026-08-22 - feat（随 0.34.4–0.34.8 发布，明细见 CHANGELOG.md）
 - 0.34.4：修复包内技能注册白名单漏登 dsh-repo-clone（PACKAGED 补登；版本只增不覆盖）。
 - 0.34.5：包内技能注册改自动扫描 skills/ 目录（目录即真相，替代硬编码白名单；readdirSync + splitFrontmatter/parseFrontmatterMeta，逐条 try/catch 隔离）。
