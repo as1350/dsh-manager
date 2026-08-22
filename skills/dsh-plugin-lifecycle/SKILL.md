@@ -1,6 +1,5 @@
 ---
 user-invocable: false
-disable-model-invocation: true
 name: dsh-plugin-lifecycle
 description: Use when the user asks to create, develop, update, upgrade, modify, fix, scaffold, build, inject, hot-reload, productionize, package, port, release, remove, uninstall, delete, list, or inspect a DSH plugin — the full plugin lifecycle from zero to release and retirement, including porting existing dynamic plugin code into a static package.
 whenToUse: 当用户要求制作、更新、升级、修改、改造、注入、打包、发布、卸载、删除或查看/管理 DSH 插件（dev_scaffold_plugin → dev_build_plugin → dev_inject_plugin → dev_reload_package → dev_install_package → dev_release_plugin；删除走 dev_uninject_plugin / dsh plugin remove；查看走 dev_plugin_status），或把已有动态插件源码转为静态插件包时。

@@ -4,6 +4,9 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.34.7 - 2026-08-22 - fix
+- dsh-plugin-lifecycle 恢复模型自动调用：SKILL.md frontmatter 移除 `disable-model-invocation: true`。0.34.6 起注册开始解析 invocation 后，该行与 `user-invocable: false` 组合成双禁（modelInvocable:false + userInvocable:false），技能完全不可达；移除后为仅模型自动调用（`user-invocable: false` 保留——用户显式调用仍不可用，需要时可再移除该行）。镜像副本（skill仓库 `plugins\dsh-manager\dsh-plugin-lifecycle\SKILL.md`）已同步。
+
 ## 0.34.6 - 2026-08-22 - fix
 - 复核 0.34.5 扫描改造（全角度审查 + 二审剔除虚假问题后）修复包内技能注册的 frontmatter 元数据丢失：
   - **invocation 透传**：此前注册忽略 frontmatter 的 `disable-model-invocation` / `user-invocable`，一律落默认 `{modelInvocable:true, userInvocable:true}`——`dsh-plugin-lifecycle`（作者意图 user-invoked）被错误地变为模型可自动调用、`service-config` 的 `user-invocable:false` 失效。现解析两字段：`disable-model-invocation: true` → `modelInvocable:false`（仅用户显式调用）；`user-invocable: false` → `userInvocable:false`（仅模型自动路由）。
