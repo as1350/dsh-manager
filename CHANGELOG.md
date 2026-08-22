@@ -4,6 +4,9 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.35.4 - 2026-08-22 - feat
+- Skills 面板秒显缓存（前端）：catalog 快照按 (sessionId, cwd) 缓存（`skillCatalogCache`）——面板重开先秒显上次数据再后台刷新，消除组件卸载导致的 50-150ms 白屏等待；会话/工作目录变化时缓存 key 不匹配自动失效；reloadTick 刷新按钮仍强制重拉。
+
 ## 0.35.3 - 2026-08-22 - feat
 - 本地仓库面板首开提速（启动预热）：host `apply()` 启动时后台预热 `repoScan` SWR 缓存（fire-and-forget，不阻塞启动）——浏览器启动后**首次**打开面板直接命中缓存，7-8s 全量扫描等待变为秒开（此前缓存只在面板打开过之后才存在，冷启动首开必全量）。
 - `refreshRepoScanInBackground` 返回进行中的 promise + `repoScanRefreshPromise`：缓存未就绪但预热/后台刷新进行中时，`repoScan` handler 等待同一次构建（防止启动预热与首开面板双路并行全量扫描）。

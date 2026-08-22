@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-22 - feat（随 0.35.4 发布，明细见 CHANGELOG.md）
+- Skills 面板秒显缓存：catalog 快照按 (sessionId, cwd) 前端缓存，重开面板先秒显旧数据再后台刷新；会话/工作目录变化自动失效；reloadTick 仍强制重拉。
+
 ## 2026-08-22 - feat（随 0.35.3 发布，明细见 CHANGELOG.md）
 - 本地仓库面板首开提速：host 启动时后台预热 repoScan SWR 缓存（fire-and-forget）——冷启动首次打开面板从 7-8s 变秒开；refreshRepoScanInBackground 返回进行中 promise，缓存未就绪时 handler 等待预热完成，防双路并行全量扫描。
 
