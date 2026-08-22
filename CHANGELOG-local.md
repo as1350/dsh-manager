@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-22 - fix（随 0.35.5 发布，明细见 CHANGELOG.md）
+- Skills 面板秒显缓存持久化到 sessionStorage：修复 0.35.4 内存态缓存随页面/标签页重载丢失（重开 Skills 面板空白 1-3s）；刷新后仍秒显旧数据再后台刷新；读写 try/catch 防存储不可用。
+
 ## 2026-08-22 - feat（随 0.35.4 发布，明细见 CHANGELOG.md）
 - Skills 面板秒显缓存：catalog 快照按 (sessionId, cwd) 前端缓存，重开面板先秒显旧数据再后台刷新；会话/工作目录变化自动失效；reloadTick 仍强制重拉。
 

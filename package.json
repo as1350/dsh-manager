@@ -1,7 +1,7 @@
 {
   "name": "@deepseek-ai/dsh-manager",
   "description": "DSH 管理面板（静态插件包）：Skills 管理（目录/开关/回收站/备注/别名/拼音/缓存）+ 目录驱动的部署补丁管理器（replace/script/override 三类补丁、多文件事务启用、官方快照+链重放状态模型、前置/互斥声明、类别分组、导入/拖放、恢复手册 RECOVERY.md、CLI 兜底）+ 本地仓库面板（多根目录/本地项目/GitHub镜像/Skill仓库/应用到全局项目插件）。",
-  "version": "0.35.4",
+  "version": "0.35.5",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
