@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-22 - fix（随 0.35.1 发布，明细见 CHANGELOG.md）
+- 0.35.0 审核修复：repoScan 缓存支持 force 强制重扫（reload 按钮 / repoInvalidate 路径恢复原语义）。
+
 ## 2026-08-22 - feat（随 0.35.0 发布，明细见 CHANGELOG.md）
 - 本地仓库面板 repoScan SWR 缓存（15s TTL，过期先回旧值后台重扫）——根治每次打开面板 7-8s 全量重扫。
 - dsh-repo-clone 新增步骤 6：克隆后快速分析（项目摘要）+ DSH 插件判定 + 询问用户是否装配。

@@ -4,6 +4,9 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.35.1 - 2026-08-22 - fix
+- 0.35.0 审核修复：`repoScan` SWR 缓存支持 `{ force: true }` 强制重扫——reload 刷新按钮与 `repoInvalidate`（服务面板注册状态变更→仓库面板重扫）路径改走强制刷新，恢复「用户主动刷新 / 注册变更后必须拿到最新数据」的原语义（此前 15s 缓存会吞掉刷新意图，角标最长滞后 15s）。
+
 ## 0.35.0 - 2026-08-22 - feat
 - 本地仓库面板加载提速（fix）：`repoScan` 加 host 侧 SWR 缓存（15s TTL）——面板每次打开无条件全量重扫（4 根目录递归 + 未登记仓库 gh 网络探测 + 全仓库 git spawn）导致首次/页面态丢失后 7-8s 加载；现新鲜缓存直接回、过期先回旧值 + 后台单飞重扫（与 repoDetail 三层缓存同款模式），折叠再开与隔时再开均秒回。
 - dsh-repo-clone 克隆后快速分析 + 装配询问（feat）：克隆完成必做快速查看（package.json / README 头部 / cordis.patch.yml / lib 入口），输出 3–5 行摘要；按 4 特征判定 DSH 插件（`dsh` 配置 / cordis.patch.yml / `@deepseek-ai/cordis` peerDeps / `__ModuleLoader__` 或 `ctx.effect`），是则询问用户是否装配（`link:` 直连或构建后 `file: tgz` 快照，按 local-governance 流程），否则仅汇报。
