@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-24 - fix（随 0.37.2 发布，明细见 CHANGELOG.md）
+- 审核修复：`lib/client.js` VERSION 常量未随发版递增，对齐为 0.37.2。
+
 ## 2026-08-24 - fix（随 0.37.1 发布，明细见 CHANGELOG.md）
 - 修复 `cloudRepoFromRemote` 对带尾斜杠 origin URL 的解析缺陷（`lib/repo-core.js`），仓库面板不再把此类仓库误判为「本地项目」。
 

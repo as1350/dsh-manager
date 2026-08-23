@@ -4,6 +4,9 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.37.2 - 2026-08-24 - fix
+- 审核修复：`lib/client.js:16` 硬编码 `VERSION` 常量在 0.37.1 发版时未随 `package.json` 递增（面板标题显示 v0.37.0，四件套不一致）。对齐为 0.37.2；按铁律 6（已装配版本禁止原地覆盖 tgz）递增发版。
+
 ## 0.37.1 - 2026-08-24 - fix
 - 修复仓库面板自动分类对**带尾斜杠 origin URL** 的解析缺陷：`cloudRepoFromRemote` 原正则 `/github\.com[:/]([^/]+\/[^/]+?)$/` 以 `$` 锚定行尾且不容忍尾斜杠，导致 `git clone https://github.com/owner/repo/`（地址栏复制带尾斜杠）的仓库探测返回空串，被误判为「本地项目」（实例：GeekezBrowser）。现改为先剥尾斜杠再剥 `.git` 后缀（`replace(/\/+$/, '')`），兼容 `…/`、`….git`、`….git/`、ssh、纯 URL 全形态。
 - 改动文件：`lib/repo-core.js:48`（一行）；已验证 6 组用例（尾斜杠/.git/纯 URL/ssh/空串/混合）全部正确。
