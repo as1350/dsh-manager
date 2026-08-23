@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-24 - fix（随 0.37.1 发布，明细见 CHANGELOG.md）
+- 修复 `cloudRepoFromRemote` 对带尾斜杠 origin URL 的解析缺陷（`lib/repo-core.js`），仓库面板不再把此类仓库误判为「本地项目」。
+
 ## 2026-08-24 - feat（随 0.37.0 发布，明细见 CHANGELOG.md）
 - 服务面板服务卡片：端口字段改名「服务端口 (API/TCP)-仅用于端口进程探活，无法修改启动端口」（中英双语）；新增「管理页面网址 manageUrl」配置输入框；「管理页面」按钮跳转改为优先 manageUrl、留空回退 http://127.0.0.1:端口。
 - 改动文件：`lib/client.js`（i18n、编辑器表单、草稿/保存/列表映射、按钮跳转、搜索）、`lib/index.js`（validateServiceEntry / readServicesConfig / computeServiceStatus / serviceRegister 默认条目新增 manageUrl 字段与校验）。
