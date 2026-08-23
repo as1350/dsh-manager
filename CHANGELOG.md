@@ -4,6 +4,14 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.36.0 - 2026-08-23 - feat
+- 技能优化落地（skill-optimize 消费观察账本 8 条 pending，经 writing-for-agents 去噪后 4 技能 12 处增补）：
+  - dsh-repo-clone：步骤 3 补**沙箱伪错误判据**（pwsh 报 `sh.exe` Win32 error 5 而目录 .git 完整且 `git rev-parse` 通过 → 直接以 git 校验为准继续，两次实测命中）；步骤 4 补**新根判据**（目标根不在 repos.json roots 时同步追加，与 settings.json roots 一致）；
+  - dsh-review：schema id 形态补记（release: 版本号 / observe: r-YYYYMMDD-<技能名>-NN / clone、registry: <repo>-<type>-<日期>）；observe 处理节步骤 3 补**跨技能入账归属**（按建议内容所指技能入账，不按留痕 id 技能）；步骤 1 补**多仓 diff 判据**（子模块/多仓库按仓分别 diff）；步骤 2 第 5 维补 registry/clone 无打包动作判据；步骤 4 补**自我审核外部证据判据**（本人产物每条结论附可独立复现证据）；
+  - local-governance：流程 A 补 **EPERM 处理**（npm pack cache 锁 → `--cache` 重定向重试）与**收尾自检**（四件套一致 + git status 干净）；流程 B 补**技能副本同步**（包内 skills/ 变更时复制 ~/.agents/skills 同名副本，防副本 first-wins 服务旧内容）；
+  - service-config：步骤 0 补 aiExplain.enabled 检查途径（settings.json 直读或面板 RPC）；「API 与坑」补『启动命令未在 PATH 中找到』误报示例（绝对路径 exe 属 token 切分误报）；步骤 5 补服务管理总开关前置检查。
+- 剔除 3 条噪音建议（dismissed 留审计）：repo-clone-002 s4 加载通道（机制层议题，0.35.9 已缓解）；dsh-review-003 s1 步骤 0 补句（-004 审核实测未复现）；local-gov-001 s1 MANIFEST notes（建议自评可不改，0.35.7 已缓解）。
+
 ## 0.35.9 - 2026-08-23 - feat
 - 观察机制收尾留痕改「队列复盘」（grilling 设计树定案：S2 留痕 + S1 批审组合，替代"收尾 4 步复盘直写账本"的软约定）：约定块文本改为——收尾写一条观察留痕（1-3 行，引用 SKILL.md 小节，无发现写 no-op 占位）→ 追加到 pending-reviews.json（type=observe，status=pending，id=r-YYYYMMDD-<技能名>-NN，summary 填留痕全文）→ 由 dsh-review 攒批审核后正式入账 skill-observations.json。**没写留痕即违约，队列缺失条目就是证据**——失败从静默变可见（原机制失败无痕：账本不写是唯一表现，宿主与模型都无法感知"该复盘而没复盘"）。每任务开销从 4 步降到 1 步留痕，评审判断从任务收尾的自觉动作移到治理流程批处理（成本按批摊销，低性能机器可用）；dsh-review 新增 observe 类条目处理（no-op 直接 done / 有效内容整理入账 / 模糊/重复/过拟合剔除并注原因）。
 - 一次任务统一只写一条留痕、覆盖全部被观察技能、不直接改 SKILL.md 的约定保留。

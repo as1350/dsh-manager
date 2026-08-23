@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-23 - feat（随 0.36.0 发布，明细见 CHANGELOG.md）
+- 4 技能 SKILL.md 优化落地（skill-optimize 消费观察账本 8 条 pending，writing-for-agents 去噪后 12 处增补）：dsh-repo-clone 沙箱伪错误判据/新根判据；dsh-review schema id 形态补记/跨技能入账归属/多仓 diff/registry-clone 打包跳过/自我审核外部证据；local-governance 流程 A/B 发版链固化（EPERM `--cache` 重定向 + 收尾四件套自检 + 包内 skills/ 变更时同步 ~/.agents/skills 副本）；service-config aiExplain 检查途径/『启动命令未在 PATH 中找到』误报示例/总开关前置检查。剔除 3 条噪音建议（dismissed 留审计）。
+
 ## 2026-08-23 - feat（随 0.35.9 发布，明细见 CHANGELOG.md）
 - 观察机制收尾留痕改「队列复盘」：约定块文本改为收尾 1 步留痕入队（type=observe，id=r-YYYYMMDD-<技能名>-NN，summary=留痕全文，无发现写 no-op 占位）+ 没写即违约（队列缺失条目即证据）；dsh-review 新增 observe 类条目处理（攒批评审：no-op done / 有效整理入账 skill-observations.json / 模糊重复过拟合剔除注原因）。
 

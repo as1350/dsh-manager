@@ -17,7 +17,7 @@ description: 审核/复核项目更新：读待审核队列（_governance/pendin
   "updatedAt": "ISO8601",
   "items": [
     {
-      "id": "唯一 id（版本号或 r-YYYYMMDD-NN）",
+      "id": "唯一 id（release: 版本号；observe: r-YYYYMMDD-<技能名>-NN；clone/registry: <repo>-<type>-<日期>）",
       "type": "release | patch | code-change | registry | clone | observe",
       "summary": "一句话摘要",
       "repo": "仓库绝对路径",
@@ -49,7 +49,7 @@ observe 类条目（观察留痕，由被观察技能收尾时按观察约定块
 对选定的 observe 类条目（跳过步骤 1-5，无代码可审）逐条处理：
 1. **no-op**（summary 为 no-op / 本次无发现）→ `status=done`、`reviewedAt`=当前时间、`reviewNotes`="no-op，不产生账本记录"；同一技能连续多条 no-op → reviewNotes 标注异常模式供 skill-optimize 参考；
 2. **剔除**（有内容但对照 writing-for-agents 评估：模糊无引用小节 / 与已有记录重复 / 单次过拟合）→ `status=done`、reviewNotes 写剔除原因，不入账；
-3. **入账**（有效）→ 追加到 `_governance/skill-observations.json` 对应技能 entries：保留队列条目 `id` 与 `createdAt`，summary/findings/suggestions 由留痕整理（status=pending、handledAt=null），并刷新该文件顶层 updatedAt；队列条目 `status=done`、reviewNotes 记入账去向（技能名+条目 id）；
+3. **入账**（有效）→ 追加到 `_governance/skill-observations.json` 对应技能 entries：保留队列条目 `id` 与 `createdAt`，summary/findings/suggestions 由留痕整理（status=pending、handledAt=null），并刷新该文件顶层 updatedAt；队列条目 `status=done`、reviewNotes 记入账去向（技能名+条目 id）；**入账归属按建议内容所指技能，不按留痕 id 技能**（跨技能统一留痕时，一条留痕可能含属于不同技能的建议，各自入各自技能 entries）；
 4. 汇总：本次处理 N 条 observe（M 条入账 / K 条 no-op / J 条剔除）。
 
 判据：选定的每条 observe 项都有 done 去向（入账 / 剔除 / no-op）。
@@ -58,7 +58,8 @@ observe 类条目（观察留痕，由被观察技能收尾时按观察约定块
 
 - 有 commits 列表 → 直接用它定位；否则 `git -C <repo> log --oneline <from>..<to>`；
 - 读关键 diff：`git -C <repo> diff <from>..<to> -- <相关文件>`；
-- 记录：变更主题、涉及文件、版本变化。
+- 记录：变更主题、涉及文件、版本变化；
+- **多仓判据**：条目涉及子模块/多仓库（commits 混合各仓 hash）→ 按仓库分别 `git diff` 定位（主仓与各子模块各自 diff），不混在一处。
 
 ## 步骤 2：一审（全角度排查）
 
@@ -67,7 +68,7 @@ observe 类条目（观察留痕，由被观察技能收尾时按观察约定块
 2. **数据流透传**：数据/字段从源头到消费端完整，无中间环节丢弃；
 3. **兼容性与回归**：与旧版本行为差异；查 git 历史判定"本次引入"还是"历史遗留"（历史遗留标引入版本）；
 4. **契约耦合**：被改动调用的外部 API（类型定义、校验规则、生命周期语义）匹配；
-5. **打包/装配/版本**：版本四件套一致、打包产物与源码一致、装配副本正确；
+5. **打包/装配/版本**：版本四件套一致、打包产物与源码一致、装配副本正确；registry/clone 类条目无打包动作 → 直接核验账本与产物一致性即可；
 6. **运行时行为**：热重载、幂等、清理、冲突；
 7. **治理一致性**：账本、镜像副本、文档同步。
 
@@ -81,6 +82,8 @@ observe 类条目（观察留痕，由被观察技能收尾时按观察约定块
 判据：每条一审问题都有归类，无未归类条目。
 
 ## 步骤 4：修复前评估
+
+**自我审核判据**：审核对象若为本会话/本人提交的产物 → 每条结论需附可独立复现的外部证据（git diff 原文、文件实测、运行日志），防止自我审核偏差（同源结论不互证）。
 
 对每个真实问题：
 1. 列出修复方案的副作用与**外部可见行为变化**；

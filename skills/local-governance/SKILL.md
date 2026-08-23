@@ -43,21 +43,23 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 ## 标准流程
 
 ### A. 新快照入库
-1. 构建（宿主 tsc + client tsdown，产物进 `lib/`）；
-2. `npm pack --pack-destination D:\Desktop\Dsh\本地项目\_snapshots\<包名>\`；
+1. 构建（宿主 tsc + client tsdown，产物进 `lib/`）；纯文档/lib 型包无构建步骤 → `node --check` 源码校验即可；
+2. `npm pack --pack-destination D:\Desktop\Dsh\本地项目\_snapshots\<包名>\`；报 **EPERM**（npm cache 锁）→ 加 `--cache <临时目录>` 重定向后重试；
 3. **复制最新 tgz 到项目文件夹**（`D:\Desktop\Dsh\本地项目\<项目>\<包名>-<版本>.tgz`），随仓库提交——分发副本，他人可直接 `dsh add <tgz>`。**同一时间项目文件夹只保留最新一个 tgz**：复制前先删除目录内所有旧版本 `<包名>-*.tgz`（已被 git 跟踪的用 `git rm`），避免堆积；
 4. MANIFEST.md：「归档版本」列追加新版本，「归档文件路径」更新；
 5. 更新 `CHANGELOG.md`（追加条目：版本/日期/类型/说明）；
-6. 若同时变更装配 → 走流程 B。
+6. 若同时变更装配 → 走流程 B；
+7. **收尾自检**：四件套一致（package.json version / 产物内 VERSION 常量 / CHANGELOG.md 条目 / tgz 文件名）+ `git status` 干净 + MANIFEST 装配行指向新版本。
 
 ### B. 升级已装配包
 1. 改 `~/.dsh/profiles/web/package.json` 的 `file:` 路径指向新快照；
 2. profile 目录执行 `pnpm install`（注意：若 pnpm 复用旧 link 解析，需清除 `node_modules/.pnpm/lock.yaml` 与 `.package-map.json` 残留后重装）；
 3. 验证 `node_modules\<包>` 为实体目录、lockfile 记录 tarball integrity；
-4. MANIFEST.md：「装配方式/装配版本」更新；
-5. 更新 `CHANGELOG.md`（追加条目：版本/日期/类型/说明）；
-6. 同步项目文件夹内的最新 tgz（复制 + 提交，见流程 A 第 3 步）；
-7. 提醒用户重启 DSH 并验证 `dev_plugin_status`。
+4. **包内 skills/ 有变更时同步技能副本**：`~/.agents/skills\<同名技能>\SKILL.md` 复制为新包 body（观察块由机制同步，正文需手动换新），否则副本 first-wins 会服务旧内容；
+5. MANIFEST.md：「装配方式/装配版本」更新；
+6. 更新 `CHANGELOG.md`（追加条目：版本/日期/类型/说明）；
+7. 同步项目文件夹内的最新 tgz（复制 + 提交，见流程 A 第 3 步）；
+8. 提醒用户重启 DSH 并验证 `dev_plugin_status` 与 `skill('<名>')` 返回新内容。
 
 ### C. 回滚
 1. `file:` 改回归档旧版本 tgz → `pnpm install` → 重启；

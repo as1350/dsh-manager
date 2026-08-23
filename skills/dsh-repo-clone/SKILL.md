@@ -20,11 +20,15 @@ description: 克隆远端 Git/GitHub 仓库到本地 DSH 目录树并登记治�
      = Windows 默认 SSL 后端经本地代理握手失败 → 加 `-c http.sslBackend=openssl`
      重试（单次生效，不改全局配置）。
 3. **校验**：`git -C <目录> log --oneline -1`（最新提交）、`branch --show-current`（分支）、
-   `submodule status`（输出为空 = 无子模块，入账时在 notes 注明）。
+   `submodule status`（输出为空 = 无子模块，入账时在 notes 注明）；
+   - **沙箱伪错误判据**（实测两次命中）：pwsh 报 `sh.exe` 信号管道错误（Win32 error 5）而目录已含完整
+     `.git` 且 `git rev-parse` 通过时，属沙箱命名管道限制产物，**直接以 git 校验为准继续**，不重试克隆。
 4. **入账**：按 local-governance 流程 G 写 `_governance/repos.json` 与 `_governance/REPOS.md`：
    - 上游镜像 → `type=mirror`、`upstream=<owner/repo>`、`cloudRepo=""`；
    - 字段值域、notes 惯例、updatedAt 一律以 local-governance 为准；
-   - 写完校验 repos.json 仍可被 JSON 解析。
+   - 写完校验 repos.json 仍可被 JSON 解析；
+   - **新根判据**：目标目录所在根不在 `repos.json.roots` 时，同步追加该根（与 `settings.json`
+     roots/rootTypes 保持一致），否则账实不一致。
 
 5. **队列登记**：克隆属登记类变更，按 **dsh-review** 技能的队列约定**静默入队**——
    向 `_governance/pending-reviews.json` 追加一条 `type=clone` 记录（字段 schema 以 dsh-review 为准），**不询问**用户。

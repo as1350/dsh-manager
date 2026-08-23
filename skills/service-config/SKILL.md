@@ -12,7 +12,7 @@ description: 给本地项目配置 dsh-manager 服务面板的服务。识别服
 
 ### 0. 前置确认
 - 项目路径存在（`stat` 通过且为目录）。
-- 服务面板 AI 助手已启用（`readRepoSettings().aiExplain.enabled === true`；未启用先告知用户去面板「AI 服务助手」设置开启）。
+- 服务面板 AI 助手已启用（`aiExplain.enabled === true`；检查途径二选一：直读 `~/.dsh/dsh-manager/settings.json` 或面板 RPC；未启用先告知用户去面板「AI 服务助手」设置开启）。
 - 服务面板地址 `http://127.0.0.1:3080/api/dsh-manager`，POST body `{method, args}`，请求头 `Origin: http://127.0.0.1:3080`。
 
 **完成标准**：路径可 stat、AI 可用（或已明确告知用户）。
@@ -38,7 +38,7 @@ description: 给本地项目配置 dsh-manager 服务面板的服务。识别服
 **完成标准**：返回 `ok:true` 且返回列表与确认内容一致（逐个字段核对）。
 
 ### 5. 阶梯测试 + 测试后停止
-按「阶梯测试」启动每个服务并逐级验证；测完**必须停止**（Q5 原则），不把服务留在运行态。
+启动前先确认**服务管理总开关**已开启（总开关关闭时 `serviceStart` 返回『服务管理总开关已关闭，无法启动服务』，此时先告知用户去面板开启再继续）；按「阶梯测试」启动每个服务并逐级验证；测完**必须停止**（Q5 原则），不把服务留在运行态。
 
 **完成标准**：每个服务达到它应有的等级（有 healthUrl 必须 200，否则至少端口监听）；全部测完且全部已停止。
 
@@ -76,7 +76,7 @@ description: 给本地项目配置 dsh-manager 服务面板的服务。识别服
 ## API 与坑
 
 - `serviceConfigSet {path, services:[...]}`：**全量替换**该 path 的服务列表（踩过：只传新服务把旧的覆盖丢了）。
-- 保存时绝对路径 command 会报 warning「未在 PATH 中找到」——**误报**，detached 直启正常，忽略。
+- 保存时绝对路径 command 会报 warning「未在 PATH 中找到」——**误报**，detached 直启正常，忽略。实测返回『启动命令未在 PATH 中找到』且把盘符当命令 token；command 为绝对路径 exe（如 `D:\...\python.exe`）时属 token 切分误报，非真实问题。
 - entry 字段：`name/cwd/command/args/env/port/autoStart/autoRestart/detached/healthUrl/envFile/startTimeoutMs`；服务型项目 detached 用 `true`。
 - 配置落盘：`D:\Desktop\Dsh\本地项目\_governance\services.json`，结构 `{services:{pathKey:[entry...]}}`。
 - PowerShell 脚本里 `$n:` 会被当变量名 → 用 `${n}` 或 `-f` 格式化。
