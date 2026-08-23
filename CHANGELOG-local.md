@@ -3,6 +3,10 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-24 - fix（随 0.36.2 发布，明细见 CHANGELOG.md）
+- 修复 AI 队列错误处理时 `gen` 变量定义域导致的 `ReferenceError` 致命崩溃错误（`lib/index.js`）。
+- 服务面板新增「项目置顶星标」与「卡片/列表」视图切换持久化功能（`lib/client.js`）。
+
 ## 2026-08-23 - docs（随 0.36.1 发布，明细见 CHANGELOG.md）
 - 第二轮技能优化（消费观察账本 2 条 pending）：local-governance 流程 G 补删除仓库模板（repos.json/REPOS.md 联动 + pending-reviews 悬空 clone/registry 记录同步移除）；skill-optimize 补剔除证据跨记录判据 + 多技能可合并单次发版。
 

@@ -4,6 +4,10 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.36.2 - 2026-08-24 - fix
+- 修复 `dsh-manager` 在 AI 队列错误处理时抛出 `ReferenceError: gen is not defined` 导致 `dsh web` 宿主崩溃的缺陷（提升 `gen` 变量声明至 `try` 块外部）。
+- 服务面板视图支持卡片/列表切换及项目置顶星标功能。
+
 ## 0.36.1 - 2026-08-23 - docs
 - 技能优化（第二轮，消费观察账本 2 条 pending）：
   - local-governance 流程 G「常见 agent 指令模板」补**删除仓库模板**：删目录 → repos.json 删条目 + updatedAt → REPOS.md 删行 → **pending-reviews.json 中该仓库悬空 clone/registry 记录同步移除（或标 skipped 注原因）**，避免悬空待审（icon 仓库删除实证）；
