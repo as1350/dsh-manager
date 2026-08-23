@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-23 - docs（随 0.36.1 发布，明细见 CHANGELOG.md）
+- 第二轮技能优化（消费观察账本 2 条 pending）：local-governance 流程 G 补删除仓库模板（repos.json/REPOS.md 联动 + pending-reviews 悬空 clone/registry 记录同步移除）；skill-optimize 补剔除证据跨记录判据 + 多技能可合并单次发版。
+
 ## 2026-08-23 - feat（随 0.36.0 发布，明细见 CHANGELOG.md）
 - 4 技能 SKILL.md 优化落地（skill-optimize 消费观察账本 8 条 pending，writing-for-agents 去噪后 12 处增补）：dsh-repo-clone 沙箱伪错误判据/新根判据；dsh-review schema id 形态补记/跨技能入账归属/多仓 diff/registry-clone 打包跳过/自我审核外部证据；local-governance 流程 A/B 发版链固化（EPERM `--cache` 重定向 + 收尾四件套自检 + 包内 skills/ 变更时同步 ~/.agents/skills 副本）；service-config aiExplain 检查途径/『启动命令未在 PATH 中找到』误报示例/总开关前置检查。剔除 3 条噪音建议（dismissed 留审计）。
 

@@ -136,6 +136,7 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 - **转为本地项目**：调整 remote → repos.json `type=local` + REPOS.md。
 - **登记本地修改**：检测 outgoing 中未被 `CHANGELOG-local.md` 覆盖的 commit → 生成指令要求 agent 补登 `### [commit <hash>] <标题>` 并提交文档。
 - **应用到插件包**：复制技能目录到 `<项目>/<插件包>/skills/<技能名>/` → 按 dsh-plugin-lifecycle 打包/提交/升版本/更新 MANIFEST。
+- **删除仓库**：删目录 → repos.json 删条目 + 更新 updatedAt → REPOS.md 删行 → **pending-reviews.json 中该仓库的悬空 clone/registry 记录同步移除（或标 skipped 注原因）**，避免悬空待审（仓库已不存在无法审核）。
 
 **完成判据**：repos.json 与目录实况一致；每个仓库条目都有正确 `type/git/cloudRepo`；REPOS.md 跟 repos.json 同步更新；所有命令不推送未确认分支、不覆盖已有技能目录。
 

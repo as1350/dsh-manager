@@ -4,6 +4,11 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.36.1 - 2026-08-23 - docs
+- 技能优化（第二轮，消费观察账本 2 条 pending）：
+  - local-governance 流程 G「常见 agent 指令模板」补**删除仓库模板**：删目录 → repos.json 删条目 + updatedAt → REPOS.md 删行 → **pending-reviews.json 中该仓库悬空 clone/registry 记录同步移除（或标 skipped 注原因）**，避免悬空待审（icon 仓库删除实证）；
+  - skill-optimize 步骤 2 补**剔除证据跨记录判据**（剔除理由可引用他条记录/机制现状：同源重复次数、机制版本缓解、他条实测证伪，不要求单条建议自证）；步骤 5 补**多技能可合并单次发版**（同一版本号带出全部技能变更）。
+
 ## 0.36.0 - 2026-08-23 - feat
 - 技能优化落地（skill-optimize 消费观察账本 8 条 pending，经 writing-for-agents 去噪后 4 技能 12 处增补）：
   - dsh-repo-clone：步骤 3 补**沙箱伪错误判据**（pwsh 报 `sh.exe` Win32 error 5 而目录 .git 完整且 `git rev-parse` 通过 → 直接以 git 校验为准继续，两次实测命中）；步骤 4 补**新根判据**（目标根不在 repos.json roots 时同步追加，与 settings.json roots 一致）；
