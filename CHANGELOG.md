@@ -4,6 +4,11 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.37.0 - 2026-08-24 - feat
+- 服务面板服务卡片新增「管理页面网址 (manageUrl)」配置输入框：「管理页面」按钮优先跳转该网址（校验 http(s):// 开头、≤300 字符），留空回退 `http://127.0.0.1:<端口>`。
+- 「端口」字段改名「服务端口 (API/TCP)-仅用于端口进程探活，无法修改启动端口」（中英双语），明确其仅用于 TCP 端口探活、不可改启动端口的语义。
+- AI 配置助手补全：serviceAiDraft 草稿新增 manageUrl/note/envFile/startTimeoutMs（prompt schema + host 解析 + 前端 fillDraft 映射），service-config 技能 entry 字段清单与三字段正交说明同步补齐。
+
 ## 0.36.2 - 2026-08-24 - fix
 - 修复 `dsh-manager` 在 AI 队列错误处理时抛出 `ReferenceError: gen is not defined` 导致 `dsh web` 宿主崩溃的缺陷（提升 `gen` 变量声明至 `try` 块外部）。
 - 服务面板视图支持卡片/列表切换及项目置顶星标功能。

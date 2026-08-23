@@ -3,6 +3,11 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-24 - feat（随 0.37.0 发布，明细见 CHANGELOG.md）
+- 服务面板服务卡片：端口字段改名「服务端口 (API/TCP)-仅用于端口进程探活，无法修改启动端口」（中英双语）；新增「管理页面网址 manageUrl」配置输入框；「管理页面」按钮跳转改为优先 manageUrl、留空回退 http://127.0.0.1:端口。
+- 改动文件：`lib/client.js`（i18n、编辑器表单、草稿/保存/列表映射、按钮跳转、搜索）、`lib/index.js`（validateServiceEntry / readServicesConfig / computeServiceStatus / serviceRegister 默认条目新增 manageUrl 字段与校验）。
+- AI 配置助手补全：`serviceAiDraft`（AI 帮我填）草稿新增 manageUrl/note/envFile/startTimeoutMs（prompt schema + host 解析 + client fillDraft 映射）；service-config 技能补 entry 字段清单与「port/healthUrl/manageUrl 三字段正交」说明；「AI 配置」指令文案同步加 manageUrl。
+
 ## 2026-08-24 - fix（随 0.36.2 发布，明细见 CHANGELOG.md）
 - 修复 AI 队列错误处理时 `gen` 变量定义域导致的 `ReferenceError` 致命崩溃错误（`lib/index.js`）。
 - 服务面板新增「项目置顶星标」与「卡片/列表」视图切换持久化功能（`lib/client.js`）。

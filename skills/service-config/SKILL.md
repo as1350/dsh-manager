@@ -18,7 +18,7 @@ description: 给本地项目配置 dsh-manager 服务面板的服务。识别服
 **完成标准**：路径可 stat、AI 可用（或已明确告知用户）。
 
 ### 1. 识别服务类型（确定性探测，AI 只兜底）
-按「探测规则表」扫描项目目录，产出**服务清单草稿**（每个服务含 command/args/env/port/healthUrl/detached）。规则覆盖不到的类型（纯二进制、docker-compose、拿不准）→ 停下来问用户，**不硬猜**。
+按「探测规则表」扫描项目目录，产出**服务清单草稿**（每个服务含 command/args/env/port/healthUrl/manageUrl/note/detached）。规则覆盖不到的类型（纯二进制、docker-compose、拿不准）→ 停下来问用户，**不硬猜**。
 
 **完成标准**：每个探测出的服务都有一份完整草稿；类型结论有文件证据支撑。
 
@@ -28,7 +28,7 @@ description: 给本地项目配置 dsh-manager 服务面板的服务。识别服
 **完成标准**：每个服务的 command 都是最终 exe 的绝对路径（venv 项目 = base python + `PYTHONPATH` 环境变量）；不再有 venv launcher / bat / npm 包装层。
 
 ### 3. 用户确认草稿
-一次性展示全部服务草稿（可编辑项：command/args/env/port/healthUrl/detached），**全部服务一起确认**，不要逐个确认。env 密钥值只显示占位不回填。
+一次性展示全部服务草稿（可编辑项：command/args/env/port/healthUrl/manageUrl/note/detached），**全部服务一起确认**，不要逐个确认。env 密钥值只显示占位不回填。
 
 **完成标准**：用户明确同意或修改后同意。
 
@@ -77,7 +77,8 @@ description: 给本地项目配置 dsh-manager 服务面板的服务。识别服
 
 - `serviceConfigSet {path, services:[...]}`：**全量替换**该 path 的服务列表（踩过：只传新服务把旧的覆盖丢了）。
 - 保存时绝对路径 command 会报 warning「未在 PATH 中找到」——**误报**，detached 直启正常，忽略。实测返回『启动命令未在 PATH 中找到』且把盘符当命令 token；command 为绝对路径 exe（如 `D:\...\python.exe`）时属 token 切分误报，非真实问题。
-- entry 字段：`name/cwd/command/args/env/port/autoStart/autoRestart/detached/healthUrl/envFile/startTimeoutMs`；服务型项目 detached 用 `true`。
+- entry 字段：`name/cwd/command/args/env/port/autoStart/autoRestart/detached/healthUrl/manageUrl/envFile/startTimeoutMs/note`；服务型项目 detached 用 `true`。
+- 三个跳转/探活字段正交：`port`=TCP 端口探活（进程监听）、`healthUrl`=HTTP 健康检查（200 才算健康）、`manageUrl`=管理页面网址（仅浏览器跳转，不参与探活，留空回退 `http://127.0.0.1:port`）。前后端一体/Web 服务可据 webui 入口推断 `manageUrl`；纯 API 服务留空。
 - 配置落盘：`D:\Desktop\Dsh\本地项目\_governance\services.json`，结构 `{services:{pathKey:[entry...]}}`。
 - PowerShell 脚本里 `$n:` 会被当变量名 → 用 `${n}` 或 `-f` 格式化。
 - **测试只做本地验证**：不触发业务动作（不点注册、不调业务 API）；测完自动停止（注册机/API 服务有真实副作用）。
@@ -87,7 +88,7 @@ description: 给本地项目配置 dsh-manager 服务面板的服务。识别服
 ### 样例 1：grok-register（Python venv + 前后端一体 + 多服务）
 `D:\Desktop\Dsh\反代项目\注册机\grok-register`
 - 探测：`pyvenv.cfg` → home `D:\A_work\编程语言\python\py31210`；`webui\server.py` + `static\` → 前后端一体；`start.bat` 先起 relay → 多服务。
-- 服务 1 `grok-register`：command = `D:\A_work\编程语言\python\py31210\python.exe`，args = `[-m, uvicorn, webui.server:app, --host, 127.0.0.1, --port, 8799]`，env = `{PYTHONPATH: <项目>\.venv\Lib\site-packages}`，port = 8799，healthUrl = `http://127.0.0.1:8799/`，detached = true。
+- 服务 1 `grok-register`：command = `D:\A_work\编程语言\python\py31210\python.exe`，args = `[-m, uvicorn, webui.server:app, --host, 127.0.0.1, --port, 8799]`，env = `{PYTHONPATH: <项目>\.venv\Lib\site-packages}`，port = 8799，healthUrl = `http://127.0.0.1:8799/`，manageUrl = `http://127.0.0.1:8799/`，detached = true。
 - 服务 2 `proxy-relay`：command 同 base python，args = `[proxy_relay.py]`，env 同 PYTHONPATH，port = 10809，healthUrl = `http://127.0.0.1:10810/status`，detached = true。
 - 阶梯测试：8799 `/` → 200；`/api/status` → `proxy_ctrl_alive:true`；10810 `/status` → JSON。
 
