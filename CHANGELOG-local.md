@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-23 - feat（随 0.35.9 发布，明细见 CHANGELOG.md）
+- 观察机制收尾留痕改「队列复盘」：约定块文本改为收尾 1 步留痕入队（type=observe，id=r-YYYYMMDD-<技能名>-NN，summary=留痕全文，无发现写 no-op 占位）+ 没写即违约（队列缺失条目即证据）；dsh-review 新增 observe 类条目处理（攒批评审：no-op done / 有效整理入账 skill-observations.json / 模糊重复过拟合剔除注原因）。
+
 ## 2026-08-22 - fix（随 0.35.8 发布，明细见 CHANGELOG.md）
 - 观察开关跨会话/跨进程失效修复：观察状态以账本为唯一事实源，文件副本成为同步层（新增 `skillCopyCandidates` + `syncObserveBlockInCopies`）——启动时按账本对 ~/.dsh/skills、~/.agents/skills、<cwd>/.dsh/skills 全部同名副本幂等补/删约定块，skillObserveSet 对插件/文件技能均同步全部候选副本（返回 files）；根治 first-wins 注册被用户副本摘下时约定块缺失。
 - Skills 面板滚动条与弹性布局修复（.skm-content min-height: 0）。

@@ -18,7 +18,7 @@ description: 审核/复核项目更新：读待审核队列（_governance/pendin
   "items": [
     {
       "id": "唯一 id（版本号或 r-YYYYMMDD-NN）",
-      "type": "release | patch | code-change | registry | clone",
+      "type": "release | patch | code-change | registry | clone | observe",
       "summary": "一句话摘要",
       "repo": "仓库绝对路径",
       "repoId": "repos.json 中的 id",
@@ -36,11 +36,23 @@ description: 审核/复核项目更新：读待审核队列（_governance/pendin
 
 status 含义：`pending`=待审；`done`=已审完（**保留作审计痕迹，不删除**）；`skipped`=用户跳过（原因写进 reviewNotes）。
 
+observe 类条目（观察留痕，由被观察技能收尾时按观察约定块写入，本技能消费）：只填 `id`（r-YYYYMMDD-<技能名>-NN）/`type`=observe/`summary`（留痕全文 1-3 行）/`createdAt`/`status`=pending，其余字段留空；无发现时 summary 写 no-op 占位（达成审计目的，不产生账本记录）。
+
 ## 步骤 0：读队列确定审核对象
 
 1. 读 pending-reviews.json；文件不存在或 items 为空 → 告知"当前没有待审核更新"并停下；
 2. 列出全部 `status=pending` 的项：id / type / summary / createdAt / 版本范围；
 3. 把候选项列全，询问用户审核范围：当前项 / 全部 / 指定 id。
+
+## observe 类条目处理（攒批评审）
+
+对选定的 observe 类条目（跳过步骤 1-5，无代码可审）逐条处理：
+1. **no-op**（summary 为 no-op / 本次无发现）→ `status=done`、`reviewedAt`=当前时间、`reviewNotes`="no-op，不产生账本记录"；同一技能连续多条 no-op → reviewNotes 标注异常模式供 skill-optimize 参考；
+2. **剔除**（有内容但对照 writing-for-agents 评估：模糊无引用小节 / 与已有记录重复 / 单次过拟合）→ `status=done`、reviewNotes 写剔除原因，不入账；
+3. **入账**（有效）→ 追加到 `_governance/skill-observations.json` 对应技能 entries：保留队列条目 `id` 与 `createdAt`，summary/findings/suggestions 由留痕整理（status=pending、handledAt=null），并刷新该文件顶层 updatedAt；队列条目 `status=done`、reviewNotes 记入账去向（技能名+条目 id）；
+4. 汇总：本次处理 N 条 observe（M 条入账 / K 条 no-op / J 条剔除）。
+
+判据：选定的每条 observe 项都有 done 去向（入账 / 剔除 / no-op）。
 
 ## 步骤 1：定位更新内容
 
@@ -85,7 +97,7 @@ status 含义：`pending`=待审；`done`=已审完（**保留作审计痕迹，
 
 ## 完成判据
 
-选定的每一项都有结论：`done`（含 reviewNotes）或 `skipped`（含原因）；队列已写回；有真实问题则修复已按发布流程落地并告知用户。
+选定的每一项都有结论：`done`（含 reviewNotes）或 `skipped`（含原因）；observe 项按「observe 类条目处理」完成（入账 / 剔除 / no-op 各有去向）；队列已写回；有真实问题则修复已按发布流程落地并告知用户。
 
 ## 环境事实
 

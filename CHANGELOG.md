@@ -4,6 +4,10 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.35.9 - 2026-08-23 - feat
+- 观察机制收尾留痕改「队列复盘」（grilling 设计树定案：S2 留痕 + S1 批审组合，替代"收尾 4 步复盘直写账本"的软约定）：约定块文本改为——收尾写一条观察留痕（1-3 行，引用 SKILL.md 小节，无发现写 no-op 占位）→ 追加到 pending-reviews.json（type=observe，status=pending，id=r-YYYYMMDD-<技能名>-NN，summary 填留痕全文）→ 由 dsh-review 攒批审核后正式入账 skill-observations.json。**没写留痕即违约，队列缺失条目就是证据**——失败从静默变可见（原机制失败无痕：账本不写是唯一表现，宿主与模型都无法感知"该复盘而没复盘"）。每任务开销从 4 步降到 1 步留痕，评审判断从任务收尾的自觉动作移到治理流程批处理（成本按批摊销，低性能机器可用）；dsh-review 新增 observe 类条目处理（no-op 直接 done / 有效内容整理入账 / 模糊/重复/过拟合剔除并注原因）。
+- 一次任务统一只写一条留痕、覆盖全部被观察技能、不直接改 SKILL.md 的约定保留。
+
 ## 0.35.8 - 2026-08-22 - fix
 - 观察开关跨会话/跨进程失效修复（用户报告：另一个会话开的开关，本会话不生效）：根因是注入只落在切换会话视图解析出的单一目标上（插件技能=进程内存重注册、跨进程丢失；文件技能=只改 definition.path），启动补注循环也只覆盖包内注册，同名技能在别的会话被用户文件副本（~/.agents/skills 等 user-agents 源，first-wins 可能压过包内注册）摘下时约定块永远缺失。修复：观察状态以账本（skill-observations.json）为唯一事实源，文件副本成为同步层——新增 `syncObserveBlockInCopies`：启动时按账本对全部候选副本（~/.dsh/skills/<name>/SKILL.md、~/.agents/skills/<name>/SKILL.md、<cwd>/.dsh/skills/<name>/SKILL.md）幂等补（observing=true）/删（observing=false）约定块；`skillObserveSet` 对插件技能与文件技能均同步全部候选副本并返回 `files` 字段。任何会话/进程服务到的正文观察状态与账本一致。
 - 本地服务面板滚动条与弹性布局修复：在 .skm-content CSS 类中增加 min-height: 0，解决当配置项目/服务数量较多（如 4 个以上项目或服务卡片）时，由于 Flex 容器未限制最小高度导致最下方服务条目（如 sub2api-backend）被弹窗框截断且无法触发纵向滚动的 Bug。
