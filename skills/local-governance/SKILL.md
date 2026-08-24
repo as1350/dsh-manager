@@ -49,7 +49,7 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 4. MANIFEST.md：「归档版本」列追加新版本，「归档文件路径」更新；
 5. 更新 `CHANGELOG.md`（追加条目：版本/日期/类型/说明）；
 6. 若同时变更装配 → 走流程 B；
-7. **收尾自检**：四件套一致（package.json version / 产物内 VERSION 常量 / CHANGELOG.md 条目 / tgz 文件名）+ `git status` 干净 + MANIFEST 装配行指向新版本。
+7. **收尾自检**：四件套一致（package.json version / 产物内 VERSION 常量（lib/client.js 需手动同步）/ CHANGELOG.md 条目 / tgz 文件名）+ `git status` 干净 + MANIFEST 装配行指向新版本。
 
 ### B. 升级已装配包
 1. 改 `~/.dsh/profiles/web/package.json` 的 `file:` 路径指向新快照；
@@ -132,7 +132,7 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
 - **同步到 GitHub（已有远端）**：先提交未提交变更 → `git push origin <分支>` → 更新 `lastSync` + REPOS.md。
 - **创建仓库并推送**：`gh repo create <name> --source --push --public|--private` → 写 `cloudRepo` + REPOS.md。
 - **拉取更新（本地项目 behind）**：`git pull origin <分支>` → 冲突停下问用户 → 更新 `lastSync` + REPOS.md。
-- **更新镜像**：`git fetch upstream && git reset --hard upstream/<分支>` → submodule 更新 → 更新 `lastSync` + REPOS.md。镜像不允许保留本地改动；需要本地改动时先转为 `type:local` 另立项目维护。
+- **更新镜像**：`git status --porcelain` 非空 → **停下待裁决**（镜像纪律：不自动丢弃本地改动）；`git fetch upstream && git reset --hard upstream/<分支>` → submodule 更新 → 版本标识取法（`git describe --tags` > 仓库内 VERSION 文件 > 源码内版本常量 > 短SHA，格式「<版本>[+N] (<短SHA>)」）→ 更新 `lastSync` + REPOS.md。镜像不允许保留本地改动；需要本地改动时先转为 `type:local` 另立项目维护。
 - **转为本地项目**：调整 remote → repos.json `type=local` + REPOS.md。
 - **登记本地修改**：检测 outgoing 中未被 `CHANGELOG-local.md` 覆盖的 commit → 生成指令要求 agent 补登 `### [commit <hash>] <标题>` 并提交文档。
 - **应用到插件包**：复制技能目录到 `<项目>/<插件包>/skills/<技能名>/` → 按 dsh-plugin-lifecycle 打包/提交/升版本/更新 MANIFEST。
@@ -164,7 +164,7 @@ description: 维护 DSH 本地治理体系——装配资产清单（_governance
    - 登记/克隆类（registry / clone）→ **不询问**，直接静默入队。
 2. **按用户选择**：
    - 立即审核 → 加载 dsh-review 技能，按其中四步流程执行本次审核；
-   - 推迟 → 按 dsh-review 队列 schema 追加一条 `status=pending` 记录（id/type/summary/repo/repoId/commits/fromVersion/toVersion/createdAt），写回 pending-reviews.json 并更新 `updatedAt`；
+   - 推迟 → 按 dsh-review 队列 schema 追加一条 `status=pending` 记录（id/type/summary/repo/repoId/commits/fromVersion/toVersion/createdAt），写回 pending-reviews.json 并更新 `updatedAt`；**写回前重读文件尾部确认结构，只做尾部追加，勿整文件重写（防并发写覆盖）**；
 3. 队列写入后不需要额外提醒——后续本技能被调用时"待审核提醒"会顺带展示数量。
 
 ## 环境事实（勿重复探测）

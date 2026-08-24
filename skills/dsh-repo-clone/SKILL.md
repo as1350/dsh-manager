@@ -16,6 +16,7 @@ description: 克隆远端 Git/GitHub 仓库到本地 DSH 目录树并登记治�
      `git config --global http.proxy http://127.0.0.1:<端口>`（https 同）；用户明确无代理 → 跳过。
 2. **克隆**：`git clone --recurse-submodules <url> <目标目录>`
    - 目标目录已存在且非空 → 停下问用户；
+   - **克隆后统一 remote 规范**：`git remote set-url origin <规范URL>`（剥尾斜杠/`.git` 后缀，防面板误分类）；镜像仓库另 `git remote add upstream <同址URL>`（供流程 G `git fetch upstream`）；
    - **schannel 故障**（报 `schannel: AcquireCredentialsHandle failed: SEC_E_NO_CREDENTIALS`）
      = Windows 默认 SSL 后端经本地代理握手失败 → 加 `-c http.sslBackend=openssl`
      重试（单次生效，不改全局配置）。
