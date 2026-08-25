@@ -4,6 +4,9 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.37.4 - 2026-08-26 - fix
+- 弹层关闭时机修正（对齐 freebuff2api 同款修复）：全部 13 处对话框遮罩（skills/patch/repo/service 四主面板 + clone/detail/AI/设置/编辑器/日志/扩展/强杀确认）与 2 类行内菜单背景层的关闭判定从 `onClick`（松开触发）改为 `onMouseDown`（按下触发）——按下点在弹层内则无论何处松开都不关闭，按下点在遮罩上立即关闭；根除「窗口内按下拖到窗口外松手被误关」与菜单「按住拖拽误关」。`lib/client.js` 16 处替换，VERSION 常量同步 0.37.4。
+
 ## 0.37.3 - 2026-08-24 - docs
 - 技能文档优化（审核优化流程落地，6 处 SKILL.md 增补）：local-governance 流程 A 步骤 7 自检 VERSION 常量标注位置（lib/client.js 需手动同步）、流程 G「更新镜像」模板补 porcelain 非空停下待裁决判据 + 版本标识取法链（describe > 仓库 VERSION 文件 > 源码内版本常量 > 短SHA）、流程 I 入队补「重读文件尾部、只尾部追加勿整文件重写」并发写纪律；dsh-review 步骤 0 补上下文明确时跳过询问豁免、步骤 3 补未导出内部函数实测法（源码截取+常量注入 node 执行）；dsh-repo-clone 步骤 2 补克隆后统一 remote 规范（set-url 剥尾斜杠 + 镜像补 upstream 同址）。
 
