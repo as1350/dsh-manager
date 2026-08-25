@@ -3,6 +3,9 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-26 - fix（随 0.37.4 发布，明细见 CHANGELOG.md）
+- 弹层关闭判定 `onClick`→`onMouseDown`：13 处对话框遮罩 + 2 类行内菜单背景层（`lib/client.js` 共 16 处）——按下点在弹层内则无论何处松开都不关闭，按下点在遮罩上立即关闭；对齐 freebuff2api 同款交互修复。`### [commit 551554f]`
+
 ## 2026-08-24 - fix（随 0.37.2 发布，明细见 CHANGELOG.md）
 - 审核修复：`lib/client.js` VERSION 常量未随发版递增，对齐为 0.37.2。
 
