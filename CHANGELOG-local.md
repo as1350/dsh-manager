@@ -3,6 +3,10 @@
 本文件登记**未发布版本**的本地修改（已发布变更见 CHANGELOG.md）。
 格式：`日期 - 类型 - 描述`，类型 ∈ {feat, fix, chore, docs}。
 
+## 2026-08-27 - fix（随 0.38.0 发布，明细见 CHANGELOG.md）
+- 修复「外部运行中」服务点「杀死进程」死锁：`serviceExternalKill`（`lib/index.js`）守卫收窄为「相关且托管自身」（`state.services[key]` 存活 PID == 端口占用 PID），非托管相关外部进程放行 `stopServicePidGraceful` 优雅杀——外部启动进程终于可从面板停止。
+- 非 detached 服务强匹配自动接管：`lib/service-core.js` 新增 `matchExternalProcess`/`relateExternalProcessStrong`（cwd/完整命令/服务名 3 强规则；exe 基名弱匹配不算，detached 保留 0.25.0 任意匹配）；`lib/index.js` `adoptDetachedMidSession`→`adoptRelatedProcess` 接管后写状态 `detached: entry.detached===true`、5 分钟冷却防扫描重写；`scripts/unit-match.mjs` 19/19 PASS。`### [commit a2801ac]`
+
 ## 2026-08-26 - fix（随 0.37.4 发布，明细见 CHANGELOG.md）
 - 弹层关闭判定 `onClick`→`onMouseDown`：13 处对话框遮罩 + 2 类行内菜单背景层（`lib/client.js` 共 16 处）——按下点在弹层内则无论何处松开都不关闭，按下点在遮罩上立即关闭；对齐 freebuff2api 同款交互修复。`### [commit 551554f]`
 
