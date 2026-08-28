@@ -4,6 +4,11 @@
 版本号遵循 `主.次.修`，每次变更只增不覆盖（见 local-governance 铁律）。
 
 
+## 0.38.0 - 2026-08-27 - fix
+- 修复「外部运行中」服务点「杀死进程」死锁（外部启动进程无法停止的语义矛盾）：旧 `serviceExternalKill`（`lib/index.js`）把 related（相关）一律解释为「本服务自身」拒绝杀死，而 external 状态下面板不显示「停止服务」按钮（`lib/client.js`），两头封死。新守卫只拦「相关且托管自身」——`state.services[key]` 有存活 PID 且等于端口占用 PID；非托管相关外部进程放行 `stopServicePidGraceful` 优雅终止，与客户端确认框「related=true 普通确认（可杀）」的设计意图（0.23.0）对齐。
+- 自动接管放宽为强匹配（方案2保守版）：`relateExternalProcessStrong`（`lib/service-core.js`）仅 cwd/完整命令/服务名（词边界 ≥5 字符）三类强规则命中才构成接管依据；弱匹配 `exe 基名相同` 不算。detached（独立运行）服务保留 0.25.0 的任一中/弱匹配接管语义（重启接管依赖）。`adoptDetachedMidSession` 改名 `adoptRelatedProcess`：非 detached 普通服务强匹配命中即写入状态 `detached: entry.detached===true`，此后停止/重启/对账按普通托管服务处理，日志追加「dsh 已接管外部启动的进程」行；5 分钟冷却防扫描重写状态。
+- 新增 `scripts/unit-match.mjs`（19/19 PASS）覆盖分级匹配边界（cwd/完整命令/服务名/仅 exe 基名/无关进程/空命令行/盘符根 cwd/短服务名/归一化）；`lib/client.js:16` VERSION 与 `package.json` 同步 0.38.0。
+
 ## 0.37.4 - 2026-08-26 - fix
 - 弹层关闭时机修正（对齐 freebuff2api 同款修复）：全部 13 处对话框遮罩（skills/patch/repo/service 四主面板 + clone/detail/AI/设置/编辑器/日志/扩展/强杀确认）与 2 类行内菜单背景层的关闭判定从 `onClick`（松开触发）改为 `onMouseDown`（按下触发）——按下点在弹层内则无论何处松开都不关闭，按下点在遮罩上立即关闭；根除「窗口内按下拖到窗口外松手被误关」与菜单「按住拖拽误关」。`lib/client.js` 16 处替换，VERSION 常量同步 0.37.4。
 
